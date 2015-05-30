@@ -55,6 +55,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="Detour\CustomMouseHandler.cs" />
     <Compile Include="Detour\RedirectionHelper.cs" />
+    <Compile Include="Detour\Utils.cs" />
     <Compile Include="LoadingExtension.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

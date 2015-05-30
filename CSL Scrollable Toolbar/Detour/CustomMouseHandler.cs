@@ -16,38 +16,34 @@ namespace ScrollableToolbar.Detour
     /// </summary>
     public static class CustomMouseHandler
     {
-        private static T GetPrivateField<T>(object obj, string name)
+        private static readonly MethodInfo processInputOriginal = typeof(UIInput.MouseHandler).GetMethod("ProcessInput");
+        private static readonly MethodInfo processInputReplacement = typeof(CustomMouseHandler).GetMethod("ProcessInput");
+        private static RedirectCallsState processInputState;
+
+        internal static void Detour()
         {
-            return (T)obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(obj);
+            try
+            {
+                processInputState = RedirectionHelper.RedirectCalls(processInputOriginal, processInputReplacement);
+                Debug.Log("UIInput.MouseHandler.ProcessInput() has been detoured");
+            }
+            catch (Exception ex)
+            {
+                Debug.Error("Exception while detouring UIInput.MouseHandler.ProcessInput(): {0}", ex);
+            }
         }
 
-        private static void SetPrivateField<T>(object obj, string name, T value)
+        internal static void UnDetour()
         {
-            obj.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(obj, value);
-        }
-
-        private static void InvokePrivateMethod(object obj, string name, params object[] args)
-        {
-            MethodInfo method = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
-            method.Invoke(obj, args);
-        }
-
-        private static T InvokePrivateMethod<T>(object obj, string name, params object[] args)
-        {
-            MethodInfo method = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic);
-            return (T)method.Invoke(obj, args);
-        }
-
-        private static void InvokePrivateStaticMethod(Type type, string name, params object[] args)
-        {
-            MethodInfo method = type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
-            method.Invoke(null, args);
-        }
-
-        private static T InvokePrivateStaticMethod<T>(Type type, string name, params object[] args)
-        {
-            MethodInfo method = type.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic);
-            return (T)method.Invoke(null, args);
+            try
+            {
+                RedirectionHelper.RevertRedirect(processInputOriginal, processInputState);
+                Debug.Log("UIInput.MouseHandler.ProcessInput() detour has been reverted");
+            }
+            catch (Exception ex)
+            {
+                Debug.Error("Exception while reverting detour UIInput.MouseHandler.ProcessInput(): {0}", ex);
+            }
         }
 
         private static UIDragEventParameter CreateUIDragEventParameter(params object[] args)
@@ -62,17 +58,17 @@ namespace ScrollableToolbar.Detour
             // Don't try this at home kids, even I don't know how this works.
 
             // Get all used private variables on @this (these need to be saved back to the object at some point, otherwise we risk breaking things)
-            UIMouseButton m_ButtonsPressed = GetPrivateField<UIMouseButton>(@this, "m_ButtonsPressed");
-            UIMouseButton m_ButtonsUp = GetPrivateField<UIMouseButton>(@this, "m_ButtonsUp");
-            UIMouseButton m_ButtonsDown = GetPrivateField<UIMouseButton>(@this, "m_ButtonsDown");
-            Vector2 m_LastPosition = GetPrivateField<Vector2>(@this, "m_LastPosition");
-            Vector2 m_MouseMoveDelta = GetPrivateField<Vector2>(@this, "m_MouseMoveDelta");
-            UIDragDropState m_DragState = GetPrivateField<UIDragDropState>(@this, "m_DragState");
-            UIComponent m_ActiveComponent = GetPrivateField<UIComponent>(@this, "m_ActiveComponent");
-            UIComponent m_LastDragComponent = GetPrivateField<UIComponent>(@this, "m_LastDragComponent");
-            object m_DragData = GetPrivateField<object>(@this, "m_DragData");
-            float m_LastClickTime = GetPrivateField<float>(@this, "m_LastClickTime");
-            float m_LastHoverTime = GetPrivateField<float>(@this, "m_LastHoverTime");
+            UIMouseButton m_ButtonsPressed = Utils.GetPrivateField<UIMouseButton>(@this, "m_ButtonsPressed");
+            UIMouseButton m_ButtonsUp = Utils.GetPrivateField<UIMouseButton>(@this, "m_ButtonsUp");
+            UIMouseButton m_ButtonsDown = Utils.GetPrivateField<UIMouseButton>(@this, "m_ButtonsDown");
+            Vector2 m_LastPosition = Utils.GetPrivateField<Vector2>(@this, "m_LastPosition");
+            Vector2 m_MouseMoveDelta = Utils.GetPrivateField<Vector2>(@this, "m_MouseMoveDelta");
+            UIDragDropState m_DragState = Utils.GetPrivateField<UIDragDropState>(@this, "m_DragState");
+            UIComponent m_ActiveComponent = Utils.GetPrivateField<UIComponent>(@this, "m_ActiveComponent");
+            UIComponent m_LastDragComponent = Utils.GetPrivateField<UIComponent>(@this, "m_LastDragComponent");
+            object m_DragData = Utils.GetPrivateField<object>(@this, "m_DragData");
+            float m_LastClickTime = Utils.GetPrivateField<float>(@this, "m_LastClickTime");
+            float m_LastHoverTime = Utils.GetPrivateField<float>(@this, "m_LastHoverTime");
 
             // Original code follows, with modifications to allow it run in our context
             Vector2 mousePosition = translator.GetMousePosition();
@@ -80,13 +76,13 @@ namespace ScrollableToolbar.Detour
             m_ButtonsUp = UIMouseButton.None;
             m_ButtonsDown = UIMouseButton.None;
             object[] args = { translator, m_ButtonsPressed, m_ButtonsUp, m_ButtonsDown };
-            InvokePrivateStaticMethod(typeof(UIInput.MouseHandler), "GetMouseButtonInfo", args);
+            Utils.InvokePrivateStaticMethod(typeof(UIInput.MouseHandler), "GetMouseButtonInfo", args);
             m_ButtonsPressed = (UIMouseButton)args[1];
             m_ButtonsUp = (UIMouseButton)args[2];
             m_ButtonsDown = (UIMouseButton)args[3];
-            SetPrivateField(@this, "m_ButtonsPressed", m_ButtonsPressed);
-            SetPrivateField(@this, "m_ButtonsUp", m_ButtonsUp);
-            SetPrivateField(@this, "m_ButtonsDown", m_ButtonsDown);
+            Utils.SetPrivateField(@this, "m_ButtonsPressed", m_ButtonsPressed);
+            Utils.SetPrivateField(@this, "m_ButtonsUp", m_ButtonsUp);
+            Utils.SetPrivateField(@this, "m_ButtonsDown", m_ButtonsDown);
 
             float num = translator.GetAxis(@this.m_ScrollAxisName);
             if (!Mathf.Approximately(num, 0f))
@@ -95,8 +91,8 @@ namespace ScrollableToolbar.Detour
             }
             m_MouseMoveDelta = mousePosition - m_LastPosition;
             m_LastPosition = mousePosition;
-            SetPrivateField(@this, "m_MouseMoveDelta", m_MouseMoveDelta);
-            SetPrivateField(@this, "m_LastPosition", m_LastPosition);
+            Utils.SetPrivateField(@this, "m_MouseMoveDelta", m_MouseMoveDelta);
+            Utils.SetPrivateField(@this, "m_LastPosition", m_LastPosition);
             if (m_DragState == UIDragDropState.Dragging)
             {
                 if (m_ButtonsUp.IsFlagSet(UIMouseButton.Left))
@@ -104,19 +100,19 @@ namespace ScrollableToolbar.Detour
                     if (component != null && component != m_ActiveComponent)
                     {
                         UIDragEventParameter uIDragEventParameter = CreateUIDragEventParameter(component, UIDragDropState.Dragging, m_DragData, mousePosition);
-                        InvokePrivateMethod(component, "OnDragDrop", uIDragEventParameter);
+                        Utils.InvokePrivateMethod(component, "OnDragDrop", uIDragEventParameter);
                         if (!uIDragEventParameter.used || uIDragEventParameter.state == UIDragDropState.Dragging)
                         {
                             uIDragEventParameter.Cancel();
                         }
                         uIDragEventParameter = CreateUIDragEventParameter(m_ActiveComponent, uIDragEventParameter.state, uIDragEventParameter.data, mousePosition, component);
-                        InvokePrivateMethod(m_ActiveComponent, "OnDragEnd", uIDragEventParameter);
+                        Utils.InvokePrivateMethod(m_ActiveComponent, "OnDragEnd", uIDragEventParameter);
                     }
                     else
                     {
                         UIDragDropState state = (component == null) ? UIDragDropState.CancelledNoTarget : UIDragDropState.Cancelled;
                         UIDragEventParameter p = CreateUIDragEventParameter(m_ActiveComponent, state, m_DragData, mousePosition);
-                        InvokePrivateMethod(m_ActiveComponent, "OnDragEnd", p);
+                        Utils.InvokePrivateMethod(m_ActiveComponent, "OnDragEnd", p);
                     }
                     m_DragState = UIDragDropState.None;
                     m_LastDragComponent = null;
@@ -124,12 +120,12 @@ namespace ScrollableToolbar.Detour
                     m_LastClickTime = 0f;
                     m_LastHoverTime = 0f;
                     m_LastPosition = mousePosition;
-                    SetPrivateField(@this, "m_DragState", m_DragState);
-                    SetPrivateField(@this, "m_LastDragComponent", m_LastDragComponent);
-                    SetPrivateField(@this, "m_ActiveComponent", m_ActiveComponent);
-                    SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
-                    SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
-                    SetPrivateField(@this, "m_LastPosition", m_LastPosition);
+                    Utils.SetPrivateField(@this, "m_DragState", m_DragState);
+                    Utils.SetPrivateField(@this, "m_LastDragComponent", m_LastDragComponent);
+                    Utils.SetPrivateField(@this, "m_ActiveComponent", m_ActiveComponent);
+                    Utils.SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
+                    Utils.SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
+                    Utils.SetPrivateField(@this, "m_LastPosition", m_LastPosition);
                     return;
                 }
                 if (component == m_ActiveComponent)
@@ -141,31 +137,31 @@ namespace ScrollableToolbar.Detour
                     if (m_LastDragComponent != null)
                     {
                         UIDragEventParameter p2 = CreateUIDragEventParameter(m_LastDragComponent, m_DragState, m_DragData, mousePosition);
-                        InvokePrivateMethod(m_LastDragComponent, "OnDragLeave", p2);
+                        Utils.InvokePrivateMethod(m_LastDragComponent, "OnDragLeave", p2);
                     }
                     if (component != null)
                     {
                         UIDragEventParameter p3 = CreateUIDragEventParameter(component, m_DragState, m_DragData, mousePosition);
-                        InvokePrivateMethod(component, "OnDragEnter", p3);
+                        Utils.InvokePrivateMethod(component, "OnDragEnter", p3);
                     }
                     m_LastDragComponent = component;
-                    SetPrivateField(@this, "m_LastDragComponent", m_LastDragComponent);
+                    Utils.SetPrivateField(@this, "m_LastDragComponent", m_LastDragComponent);
                     return;
                 }
                 if (component != null && Vector2.Distance(mousePosition, m_LastPosition) > 1f)
                 {
                     UIDragEventParameter p4 = CreateUIDragEventParameter(component, m_DragState, m_DragData, mousePosition);
-                    InvokePrivateMethod(component, "OnDragOver", p4);
+                    Utils.InvokePrivateMethod(component, "OnDragOver", p4);
                 }
                 return;
             }
             else if (m_ButtonsUp != UIMouseButton.None)
             {
                 m_LastHoverTime = Time.realtimeSinceStartup + @this.m_HoverNotificationBegin;
-                SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
+                Utils.SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
                 if (m_ActiveComponent == null)
                 {
-                    InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
+                    Utils.InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
                     return;
                 }
                 if (m_ActiveComponent == component && m_ButtonsUp.IsFlagSet(UIMouseButton.Left))
@@ -173,33 +169,33 @@ namespace ScrollableToolbar.Detour
                     if (Time.realtimeSinceStartup - m_LastClickTime < @this.m_DoubleClickTime)
                     {
                         m_LastClickTime = 0f;
-                        SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
+                        Utils.SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
                         if (m_ActiveComponent.isEnabled)
                         {
-                            InvokePrivateMethod(m_ActiveComponent, "OnDoubleClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
+                            Utils.InvokePrivateMethod(m_ActiveComponent, "OnDoubleClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
                         }
                     }
                     else
                     {
                         m_LastClickTime = Time.realtimeSinceStartup;
-                        SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
+                        Utils.SetPrivateField(@this, "m_LastClickTime", m_LastClickTime);
                         if (m_ActiveComponent.isEnabled)
                         {
-                            InvokePrivateMethod(m_ActiveComponent, "OnClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
+                            Utils.InvokePrivateMethod(m_ActiveComponent, "OnClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
                         }
                         else
                         {
-                            InvokePrivateMethod(m_ActiveComponent, "OnDisabledClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
+                            Utils.InvokePrivateMethod(m_ActiveComponent, "OnDisabledClick", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 1, ray, mousePosition, Vector2.zero, num));
                         }
                     }
                 }
                 if (m_ActiveComponent.isEnabled)
                 {
-                    InvokePrivateMethod(m_ActiveComponent, "OnMouseUp", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 0, ray, mousePosition, Vector2.zero, num));
+                    Utils.InvokePrivateMethod(m_ActiveComponent, "OnMouseUp", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsUp, 0, ray, mousePosition, Vector2.zero, num));
                 }
                 if (m_ButtonsPressed == UIMouseButton.None && m_ActiveComponent != component)
                 {
-                    InvokePrivateMethod(@this, "SetActive", null, mousePosition, ray);
+                    Utils.InvokePrivateMethod(@this, "SetActive", null, mousePosition, ray);
                 }
                 return;
             }
@@ -208,23 +204,23 @@ namespace ScrollableToolbar.Detour
                 if (m_ButtonsDown != UIMouseButton.None)
                 {
                     m_LastHoverTime = Time.realtimeSinceStartup + @this.m_HoverNotificationBegin;
-                    SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
+                    Utils.SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
                     if (m_ActiveComponent != null)
                     {
                         if (m_ActiveComponent.isEnabled)
                         {
-                            InvokePrivateMethod(m_ActiveComponent, "OnMouseDown", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsDown, 0, ray, mousePosition, Vector2.zero, num));
+                            Utils.InvokePrivateMethod(m_ActiveComponent, "OnMouseDown", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsDown, 0, ray, mousePosition, Vector2.zero, num));
                             return;
                         }
                     }
                     else
                     {
-                        InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
+                        Utils.InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
                         if (component != null)
                         {
                             if (component.isEnabled)
                             {
-                                InvokePrivateMethod(component, "OnMouseDown", new UIMouseEventParameter(component, m_ButtonsDown, 0, ray, mousePosition, Vector2.zero, num));
+                                Utils.InvokePrivateMethod(component, "OnMouseDown", new UIMouseEventParameter(component, m_ButtonsDown, 0, ray, mousePosition, Vector2.zero, num));
                                 return;
                             }
                         }
@@ -241,19 +237,19 @@ namespace ScrollableToolbar.Detour
                 }
                 if (m_ActiveComponent != null && m_ActiveComponent == component && m_MouseMoveDelta.magnitude == 0f && Time.realtimeSinceStartup - m_LastHoverTime > @this.m_HoverNotificationFrequency)
                 {
-                    InvokePrivateMethod(m_ActiveComponent, "OnMouseHover", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
-                    InvokePrivateMethod(m_ActiveComponent, "OnTooltipHover", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
+                    Utils.InvokePrivateMethod(m_ActiveComponent, "OnMouseHover", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
+                    Utils.InvokePrivateMethod(m_ActiveComponent, "OnTooltipHover", new UIMouseEventParameter(m_ActiveComponent, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
                     m_LastHoverTime = Time.realtimeSinceStartup;
-                    SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
+                    Utils.SetPrivateField(@this, "m_LastHoverTime", m_LastHoverTime);
                 }
                 if (m_ButtonsPressed == UIMouseButton.None)
                 {
                     if (num != 0f && component != null)
                     {
-                        InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
+                        Utils.InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
                         if (component.isEnabled)
                         {
-                            InvokePrivateMethod(component, "OnMouseWheel", new UIMouseEventParameter(component, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
+                            Utils.InvokePrivateMethod(component, "OnMouseWheel", new UIMouseEventParameter(component, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
                         }
                         else
                         {
@@ -270,7 +266,7 @@ namespace ScrollableToolbar.Detour
                                 currentComponent = currentComponent.parent;
                                 if (currentComponent.name == "TSContainer")
                                 {
-                                    InvokePrivateMethod(component, "OnMouseWheel", new UIMouseEventParameter(component, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
+                                    Utils.InvokePrivateMethod(component, "OnMouseWheel", new UIMouseEventParameter(component, m_ButtonsPressed, 0, ray, mousePosition, Vector2.zero, num));
                                     break;
                                 }
                             }
@@ -281,7 +277,7 @@ namespace ScrollableToolbar.Detour
 
                         return;
                     }
-                    InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
+                    Utils.InvokePrivateMethod(@this, "SetActive", component, mousePosition, ray);
                 }
                 else if (m_ActiveComponent != null)
                 {
@@ -293,17 +289,17 @@ namespace ScrollableToolbar.Detour
                     if (m_MouseMoveDelta.magnitude >= (float)@this.m_DragStartDelta && m_ButtonsPressed.IsFlagSet(UIMouseButton.Left) && m_DragState != UIDragDropState.Denied)
                     {
                         UIDragEventParameter uIDragEventParameter2 = CreateUIDragEventParameter(m_ActiveComponent);
-                        InvokePrivateMethod(m_ActiveComponent, "OnDragStart", uIDragEventParameter2);
+                        Utils.InvokePrivateMethod(m_ActiveComponent, "OnDragStart", uIDragEventParameter2);
                         if (uIDragEventParameter2.state == UIDragDropState.Dragging)
                         {
                             m_DragState = UIDragDropState.Dragging;
                             m_DragData = uIDragEventParameter2.data;
-                            SetPrivateField(@this, "m_DragState", m_DragState);
-                            SetPrivateField(@this, "m_DragData", m_DragData);
+                            Utils.SetPrivateField(@this, "m_DragState", m_DragState);
+                            Utils.SetPrivateField(@this, "m_DragData", m_DragData);
                             return;
                         }
                         m_DragState = UIDragDropState.Denied;
-                        SetPrivateField(@this, "m_DragState", m_DragState);
+                        Utils.SetPrivateField(@this, "m_DragState", m_DragState);
                     }
                 }
                 if (m_ActiveComponent != null && m_MouseMoveDelta.magnitude >= 1f)
@@ -311,7 +307,7 @@ namespace ScrollableToolbar.Detour
                     UIMouseEventParameter p5 = new UIMouseEventParameter(m_ActiveComponent, m_ButtonsPressed, 0, ray, mousePosition, m_MouseMoveDelta, num);
                     if (m_ActiveComponent.isEnabled)
                     {
-                        InvokePrivateMethod(m_ActiveComponent, "OnMouseMove", p5);
+                        Utils.InvokePrivateMethod(m_ActiveComponent, "OnMouseMove", p5);
                     }
                 }
                 return;
