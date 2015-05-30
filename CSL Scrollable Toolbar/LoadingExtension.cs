@@ -45,7 +45,8 @@ namespace ScrollableToolbar
             UIScrollablePanel[] panels = FindPatchableScrollbarPanels();
             if (panels.Length == 0)
             {
-                Debug.Warning("No panels found to patch. Mod possibly needs to be updated, please inform the author of the mod");
+                Debug.Warning("No panels found to patch, aborting; mod probably needs to be updated, please inform the author of the mod");
+                return;
             }
 
             this.originalStates = new bool[panels.Length];
@@ -76,6 +77,11 @@ namespace ScrollableToolbar
         private void DisableScrolling()
         {
             UIScrollablePanel[] panels = FindPatchableScrollbarPanels();
+
+            if (panels.Length == 0)
+            {
+                return;
+            }
 
             for (int i = 0; i < panels.Length; i++)
             {
