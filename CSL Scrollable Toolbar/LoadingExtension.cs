@@ -12,19 +12,50 @@ namespace ScrollableToolbar
 {
     public class LoadingExtension : LoadingExtensionBase
     {
+        /// <summary>
+        /// Our entry point. Here we load the mod.
+        /// </summary>
+        /// <param name="mode">The game mode.</param>
         public override void OnLevelLoaded(LoadMode mode)
         {
             base.OnLevelLoaded(mode);
             this.EnableScrolling();
+
+            switch (mode)
+            {
+                case LoadMode.NewGame:
+                case LoadMode.LoadGame:
+                default:
+                    this.EnableScrolling();
+                    break;
+                case LoadMode.NewAsset:
+                case LoadMode.LoadAsset:
+                    ToolsModifierControl.toolController.eventEditPrefabChanged += this.OnAssetEditorModeChange;
+                    break;
+            }
         }
 
+        /// <summary>
+        /// Our exit point. Here we unload everything we have loaded.
+        /// </summary>
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
             this.DisableScrolling();
+            ToolsModifierControl.toolController.eventEditPrefabChanged -= this.OnAssetEditorModeChange;
         }
 
         private bool[] originalStates;
+
+        /// <summary>
+        /// The asset editor has the ability to change the toolbar on the fly.
+        /// We can monitor these changes and patch the panels when they have been refreshed.
+        /// </summary>
+        /// <param name="prefabInfo"></param>
+        private void OnAssetEditorModeChange(PrefabInfo prefabInfo)
+        {
+            this.EnableScrolling();
+        }
 
         private UIScrollablePanel[] FindPatchableScrollablePanels()
         {
@@ -41,7 +72,7 @@ namespace ScrollableToolbar
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
             if (panels.Length == 0)
             {
-                Debug.Warning("No panels found to patch, aborting; mod probably needs to be updated, please inform the author of the mod");
+                Debug.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
                 return;
             }
 
