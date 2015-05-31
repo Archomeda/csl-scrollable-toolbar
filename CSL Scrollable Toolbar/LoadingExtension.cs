@@ -16,16 +16,23 @@ namespace ScrollableToolbar
         {
             base.OnLevelLoaded(mode);
             this.EnableScrolling();
+            this.PatchToolbarWidth();
         }
 
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
             this.DisableScrolling();
+            this.UnpatchToolbarWidth();
         }
 
         private bool[] originalStates;
+        private float originalTSContainerWidth;
 
+        /// <summary>
+        /// Finds all <see cref="UIScrollablePanel"/>s in TSContainer that we can patch.
+        /// </summary>
+        /// <returns>A list of all patchable <see cref="UIScrollablePanel"/>s</returns>
         private UIScrollablePanel[] FindPatchableScrollablePanels()
         {
             GameObject obj = GameObject.Find("TSContainer");
@@ -36,6 +43,9 @@ namespace ScrollableToolbar
             return new UIScrollablePanel[0];
         }
 
+        /// <summary>
+        /// Enables scrolling on the toolbar.
+        /// </summary>
         private void EnableScrolling()
         {
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
@@ -44,6 +54,8 @@ namespace ScrollableToolbar
                 Debug.Warning("No panels found to patch, aborting; mod probably needs to be updated, please inform the author of the mod");
                 return;
             }
+
+            this.PatchToolbarWidth();
 
             this.originalStates = new bool[panels.Length];
             for (int i = 0; i < panels.Length; i++)
@@ -70,6 +82,9 @@ namespace ScrollableToolbar
             Debug.Log("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
         }
 
+        /// <summary>
+        /// Disables scrolling on the toolbar.
+        /// </summary>
         private void DisableScrolling()
         {
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
@@ -94,7 +109,43 @@ namespace ScrollableToolbar
             Debug.Log("{0} patched panels have been reverted to their original state", panels.Length);
         }
 
-        void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
+        /// <summary>
+        /// Patches the width of the toolbar to contain more items at once.
+        /// </summary>
+        private void PatchToolbarWidth()
+        {
+            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UIButton tsCloseButton = GameObject.Find("TSCloseButton").GetComponent<UIButton>();
+            this.originalTSContainerWidth = tsContainer.width;
+            int currentWidth = Mathf.RoundToInt(tsContainer.width);
+            if (currentWidth == 859)
+            {
+                // We only change the size if it hasn't been changed already by some other mod
+                int extendAmount = (int)((tsCloseButton.absolutePosition.x - tsContainer.absolutePosition.x - tsContainer.width) / 109f);
+                tsContainer.width += extendAmount * 109f;
+                Debug.Log("Toolstrip width has been patched to show {0} more items at once", extendAmount);
+            }
+            else
+            {
+                Debug.Log("Toolstrip width has not been patched since it didn't have its original width; expected = {0}, actual = {1}", 859, currentWidth);
+            }
+        }
+
+        /// <summary>
+        /// Reverts the width of the toolbar to its original value.
+        /// </summary>
+        private void UnpatchToolbarWidth()
+        {
+            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            if (tsContainer.width != this.originalTSContainerWidth)
+            {
+                tsContainer.width = this.originalTSContainerWidth;
+                Debug.Log("Toolstrip width has been reverted to its original value");
+            }
+        }
+
+
+        private void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
         {
             // We can't be sure if we get false positives
             // In order to be sure, we have to check if this component contains the right child first
