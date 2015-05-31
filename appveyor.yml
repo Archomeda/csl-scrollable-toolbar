@@ -1,0 +1,15 @@
+# We follow the versioning of Cities Skylines
+version: 1.1.0.{build}
+
+configuration: Release
+
+cache:
+  - packages
+
+build_script:
+  - ps: appveyor\Build.ps1
+
+artifacts:
+  - path: bin
+    name: ScrollableToolbar-v$(appveyor_build_version)
+    type: zip
