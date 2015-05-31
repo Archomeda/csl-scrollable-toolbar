@@ -4,7 +4,7 @@ version: 1.1.0.{build}
 configuration: Release
 
 cache:
-  - packages
+  - packages -> appveyor\packages.config
 
 build_script:
   - ps: appveyor\Build.ps1
