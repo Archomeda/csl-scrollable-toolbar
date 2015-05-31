@@ -5,8 +5,10 @@ nuget restore .\appveyor\packages.config -SolutionDirectory .\ -NonInteractive
 [xml]$packages = Get-Content .\appveyor\packages.config
 $referencePath = ($packages.packages.package | % {"..\packages\$($_.id).$($_.version)\lib\$($_.targetFramework)\"}) -Join ";"
 
+
 # Do the actual build
 msbuild /verbosity:minimal /p:ReferencePath="$referencePath"
+
 
 # Copy the files we need to .\bin
 if (Test-Path bin) {
@@ -14,3 +16,13 @@ if (Test-Path bin) {
 }
 mkdir bin | Out-Null;
 Copy-Item "CSL Scrollable Toolbar\bin\$env:CONFIGURATION\*.dll" -destination bin -recurse
+
+
+# Copy the files we need to .\workshop
+if (Test-Path workshop) {
+    Remove-Item workshop -recurse -force
+}
+mkdir workshop | Out-Null;
+mkdir workshop\Content | Out-Null;
+Copy-Item PreviewImage.png -destination workshop
+Copy-Item "bin/*" -destination workshop\Content -recurse
