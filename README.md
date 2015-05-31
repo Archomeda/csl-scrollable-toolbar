@@ -1,4 +1,6 @@
 # Cities Skylines: Scrollable Toolbar
+[![Build status](https://ci.appveyor.com/api/projects/status/u7ied8k0aacca1um/branch/master?svg=true)](https://ci.appveyor.com/project/Archomeda/csl-scrollable-toolbar/branch/master)
+
 Are you destroying your left mouse button because of all that clicking on the
 right arrow in the toolbar, just to get to that road piece that's way near the
 end? Not anymore! This mod enables mouse wheel scrolling in the toolbar. You can
