@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
@@ -151,10 +152,35 @@ namespace ScrollableToolbar.UI
 
         private static void EventHelpers_ToolbarOpened()
         {
+            // For compatibility with Enhanced Build Panel, we have to check if the UIScrollablePanel has not been patched.
+            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UIScrollablePanel panel = tsContainer.GetComponentsInChildren<UIScrollablePanel>().FirstOrDefault(p => p.isVisible);
+            if (panel.name != "ScrollablePanel")
+            {
+                return;
+            }
+            else
+            {
+                // We will keep a small compatibility problem however. This method gets called before Enhanced Build Panel changes
+                // the name of the panel for the first opening of each panel. So we check it once after a small delay to see if the name
+                // has been changed.
+                Timer timer = new Timer(100);
+                timer.Elapsed += (sender, e) =>
+                {
+                    timer.Stop();
+                    if (panel.name != "ScrollablePanel")
+                    {
+                        switchModeButton.isVisible = false;
+                    }
+                    timer.Dispose();
+                };
+                timer.Start();
+            }
+
+
             // We need to check if the size and position of TSContainer is still the same as we left it.
             // If not, then another mod has probably overwritten some stuff and we cannot enable the button.
             // Sorry Sapphire users, but I assume your skin already patches the width of the toolbar ;)
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
             if (tsContainer.absolutePosition.x >= lastTSContainerX - measureRange && tsContainer.absolutePosition.x <= lastTSContainerX + measureRange &&
                tsContainer.width >= lastTSContainerWidth - measureRange && tsContainer.width <= lastTSContainerWidth + measureRange)
             {
