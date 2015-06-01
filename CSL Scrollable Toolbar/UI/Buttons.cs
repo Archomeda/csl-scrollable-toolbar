@@ -9,15 +9,18 @@ namespace ScrollableToolbar.UI
 {
     internal static class Buttons
     {
-        internal static UIMultiStateButton switchModeButton;
+        private static UIMultiStateButton switchModeButton;
         private static float originalTSContainerX;
         private static float originalTSContainerWidth;
+        private static float lastTSContainerX = 590f;
+        private static float lastTSContainerWidth = 859f;
+        private const float measureRange = 5f;
 
 
         /// <summary>
         /// Creates our button to switch between the different toolbar modes.
         /// </summary>
-        internal static void CreateSwitchModeButton()
+        public static void CreateSwitchModeButton()
         {
             // Create button and attach it
             UISlicedSprite tsBar = GameObject.Find("TSBar").GetComponent<UISlicedSprite>();
@@ -57,7 +60,7 @@ namespace ScrollableToolbar.UI
             switchModeButton.eventActiveStateIndexChanged += switchModeButton_eventActiveStateIndexChanged;
         }
 
-        public static void switchModeButton_eventActiveStateIndexChanged(UIComponent component, int value)
+        private static void switchModeButton_eventActiveStateIndexChanged(UIComponent component, int value)
         {
             UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
             UIButton tsCloseButton = GameObject.Find("TSCloseButton").GetComponent<UIButton>();
@@ -69,6 +72,7 @@ namespace ScrollableToolbar.UI
                     tsContainer.absolutePosition = new Vector2(originalTSContainerX, tsContainer.absolutePosition.y);
                     tsContainer.width = originalTSContainerWidth;
                     break;
+
                 case 1:
                     // Patch to full width
 
@@ -94,12 +98,15 @@ namespace ScrollableToolbar.UI
 
                     break;
             }
+
+            lastTSContainerX = tsContainer.absolutePosition.x;
+            lastTSContainerWidth = tsContainer.width;
         }
 
         /// <summary>
         /// Removes our button to switch between the different toolbar modes.
         /// </summary>
-        internal static void RemoveSwitchModeButton()
+        public static void RemoveSwitchModeButton()
         {
             EventHelpers.ToolbarOpened -= EventHelpers_ToolbarOpened;
             EventHelpers.ToolbarClosed -= EventHelpers_ToolbarClosed;
@@ -120,7 +127,15 @@ namespace ScrollableToolbar.UI
 
         private static void EventHelpers_ToolbarOpened()
         {
-            switchModeButton.isVisible = true;
+            // We need to check if the size and position of TSContainer is still the same as we left it.
+            // If not, then another mod has probably overwritten some stuff and we cannot enable the button.
+            // Sorry Sapphire users, but I assume your skin already patches the width of the toolbar ;)
+            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            if (tsContainer.absolutePosition.x >= lastTSContainerX - measureRange && tsContainer.absolutePosition.x <= lastTSContainerX + measureRange &&
+               tsContainer.width >= lastTSContainerWidth - measureRange && tsContainer.width <= lastTSContainerWidth + measureRange)
+            {
+                switchModeButton.isVisible = true;
+            }
         }
 
         private static void EventHelpers_ToolbarClosed()
