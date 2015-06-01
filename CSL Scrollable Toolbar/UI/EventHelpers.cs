@@ -13,12 +13,19 @@ namespace ScrollableToolbar.UI
     /// </summary>
     internal static class EventHelpers
     {
+        private static void Initialize()
+        {
+            isToolbarOpen = false;
+        }
+
         /// <summary>
         /// Start monitoring for various UI events in the game.
         /// </summary>
         /// <param name="mode">The game mode.</param>
         public static void StartEvents(LoadMode mode)
         {
+            Initialize();
+
             switch (mode)
             {
                 case LoadMode.NewGame:
@@ -69,7 +76,7 @@ namespace ScrollableToolbar.UI
         /// </summary>
         public static event ToolbarClosedEventHandler ToolbarClosed;
 
-        private static bool isToolbarOpen = false;
+        private static bool isToolbarOpen;
 
 
         private static void OnToolbarOpened()
