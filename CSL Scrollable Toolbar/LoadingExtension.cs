@@ -6,6 +6,7 @@ using System.Text;
 using ColossalFramework.UI;
 using ICities;
 using ScrollableToolbar.Detour;
+using ScrollableToolbar.UI;
 using UnityEngine;
 
 namespace ScrollableToolbar
@@ -34,6 +35,9 @@ namespace ScrollableToolbar
                     this.PatchAdditionalComponents();
                     break;
             }
+
+            this.EnableToggleToolbarWidth(mode);
+            EventHelpers.StartEvents(mode);
         }
 
         /// <summary>
@@ -46,6 +50,9 @@ namespace ScrollableToolbar
 
             this.UnpatchPanels();
             this.UnpatchAdditionalComponents();
+            this.DisableToggleToolbarWidth();
+
+            EventHelpers.StopEvents();
         }
 
         private bool[] originalStates;
@@ -152,11 +159,39 @@ namespace ScrollableToolbar
         }
 
         /// <summary>
+        /// Patches the width of the toolbar to contain more items at once.
+        /// </summary>
+        private void EnableToggleToolbarWidth(LoadMode mode)
+        {
+            // We only add our switch mode button if the toolbar width hasn't been changed by some other mod, in order to prevent incompatibility
+            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            int currentWidth = Mathf.RoundToInt(tsContainer.width);
+            if (currentWidth == 859)
+            {
+                Buttons.CreateSwitchModeButton(mode);
+                Debug.Log("Created button to switch the toolbar width");
+            }
+            else
+            {
+                Debug.Log("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already");
+            }
+        }
+
+        /// <summary>
+        /// Reverts the width of the toolbar to its original value.
+        /// </summary>
+        private void DisableToggleToolbarWidth()
+        {
+            Buttons.RemoveSwitchModeButton();
+        }
+
+
+        /// <summary>
         /// The mouse wheel event on the parent panel of a <see cref="UIScrollablePanel"/>.
         /// </summary>
         /// <param name="component">The component on which the event has been fired.</param>
         /// <param name="eventParam">Additional event parameters.</param>
-        void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
+        private void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
         {
             // We can't be sure if we get false positives
             // In order to be sure, we have to check if this component contains the right child first
