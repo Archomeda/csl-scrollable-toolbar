@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ColossalFramework.UI;
+using ICities;
 using UnityEngine;
 
 namespace ScrollableToolbar.UI
@@ -12,16 +13,33 @@ namespace ScrollableToolbar.UI
         private static UIMultiStateButton switchModeButton;
         private static float originalTSContainerX;
         private static float originalTSContainerWidth;
-        private static float lastTSContainerX = 590f;
-        private static float lastTSContainerWidth = 859f;
+        private static float lastTSContainerX;
+        private static float lastTSContainerWidth;
         private const float measureRange = 5f;
 
 
         /// <summary>
         /// Creates our button to switch between the different toolbar modes.
         /// </summary>
-        public static void CreateSwitchModeButton()
+        public static void CreateSwitchModeButton(LoadMode mode)
         {
+            // Initialize variables
+            lastTSContainerWidth = 859f;
+            switch (mode)
+            {
+                case LoadMode.NewGame:
+                case LoadMode.LoadGame:
+                case LoadMode.NewAsset:
+                case LoadMode.LoadAsset:
+                default:
+                    lastTSContainerX = 590f;
+                    break;
+                case LoadMode.NewMap:
+                case LoadMode.LoadMap:
+                    lastTSContainerX = 676f;
+                    break;
+            }
+
             // Create button and attach it
             UISlicedSprite tsBar = GameObject.Find("TSBar").GetComponent<UISlicedSprite>();
             switchModeButton = tsBar.AddUIComponent<UIMultiStateButton>();
