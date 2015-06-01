@@ -19,18 +19,19 @@ namespace ScrollableToolbar
         public override void OnLevelLoaded(LoadMode mode)
         {
             base.OnLevelLoaded(mode);
-            this.EnableScrolling();
 
             switch (mode)
             {
                 case LoadMode.NewGame:
                 case LoadMode.LoadGame:
                 default:
-                    this.EnableScrolling();
+                    this.PatchPanels();
+                    this.PatchAdditionalComponents();
                     break;
                 case LoadMode.NewAsset:
                 case LoadMode.LoadAsset:
                     ToolsModifierControl.toolController.eventEditPrefabChanged += this.OnAssetEditorModeChange;
+                    this.PatchAdditionalComponents();
                     break;
             }
         }
@@ -41,8 +42,10 @@ namespace ScrollableToolbar
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
-            this.DisableScrolling();
             ToolsModifierControl.toolController.eventEditPrefabChanged -= this.OnAssetEditorModeChange;
+
+            this.UnpatchPanels();
+            this.UnpatchAdditionalComponents();
         }
 
         private bool[] originalStates;
@@ -54,9 +57,13 @@ namespace ScrollableToolbar
         /// <param name="prefabInfo"></param>
         private void OnAssetEditorModeChange(PrefabInfo prefabInfo)
         {
-            this.EnableScrolling();
+            this.PatchPanels();
         }
 
+        /// <summary>
+        /// Finds all <see cref="UIScrollablePanel"/>s in TSContainer that we can patch.
+        /// </summary>
+        /// <returns>A list of all patchable <see cref="UIScrollablePanel"/>s</returns>
         private UIScrollablePanel[] FindPatchableScrollablePanels()
         {
             GameObject obj = GameObject.Find("TSContainer");
@@ -67,7 +74,10 @@ namespace ScrollableToolbar
             return new UIScrollablePanel[0];
         }
 
-        private void EnableScrolling()
+        /// <summary>
+        /// Patches the <see cref="UIScrollablePanel"/>s to make them accept the mouse wheel as input.
+        /// </summary>
+        private void PatchPanels()
         {
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
             if (panels.Length == 0)
@@ -94,14 +104,13 @@ namespace ScrollableToolbar
                 }
             }
 
-            // Although it is supported, somehow disabled UI objects do not send the OnMouseWheel event.
-            // We are patching that here by redirecting the calls from the original method to our method.
-            CustomMouseHandler.Detour();
-
             Debug.Log("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
         }
 
-        private void DisableScrolling()
+        /// <summary>
+        /// Undo the patch that make the <see cref="UIScrollablePanel"/> accept the mouse wheel as input.
+        /// </summary>
+        private void UnpatchPanels()
         {
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
 
@@ -120,11 +129,33 @@ namespace ScrollableToolbar
                 }
             }
 
-            CustomMouseHandler.UnDetour();
-
             Debug.Log("{0} patched panels have been reverted to their original state", panels.Length);
         }
 
+
+        /// <summary>
+        /// Patch some additional components to make them accept the mouse wheel as input.
+        /// </summary>
+        private void PatchAdditionalComponents()
+        {
+            // Although it is supported, somehow disabled UI objects do not send the OnMouseWheel event.
+            // We are patching that here by redirecting the calls from the original method to our method.
+            CustomMouseHandler.Detour();
+        }
+
+        /// <summary>
+        /// Undo the patch that makes additional componenents accept the mouse wheel as input.
+        /// </summary>
+        private void UnpatchAdditionalComponents()
+        {
+            CustomMouseHandler.UnDetour();
+        }
+
+        /// <summary>
+        /// The mouse wheel event on the parent panel of a <see cref="UIScrollablePanel"/>.
+        /// </summary>
+        /// <param name="component">The component on which the event has been fired.</param>
+        /// <param name="eventParam">Additional event parameters.</param>
         void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
         {
             // We can't be sure if we get false positives
