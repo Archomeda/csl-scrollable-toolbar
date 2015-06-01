@@ -73,7 +73,6 @@ namespace ScrollableToolbar.UI
 
         private static void OnToolbarOpened()
         {
-            Debug.Log("Toolbar opened");
             var handler = ToolbarOpened;
             if (handler != null)
                 handler();
@@ -81,7 +80,6 @@ namespace ScrollableToolbar.UI
 
         private static void OnToolbarClosed()
         {
-            Debug.Log("Toolbar closed");
             var handler = ToolbarClosed;
             if (handler != null)
                 handler();
