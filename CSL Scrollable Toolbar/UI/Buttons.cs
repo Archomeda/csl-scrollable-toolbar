@@ -10,6 +10,7 @@ namespace ScrollableToolbar.UI
     internal static class Buttons
     {
         internal static UIMultiStateButton switchModeButton;
+        private static float originalTSContainerX;
         private static float originalTSContainerWidth;
 
 
@@ -65,13 +66,32 @@ namespace ScrollableToolbar.UI
             {
                 case 0:
                     // Reset to normal width
+                    tsContainer.absolutePosition = new Vector2(originalTSContainerX, tsContainer.absolutePosition.y);
                     tsContainer.width = originalTSContainerWidth;
                     break;
                 case 1:
                     // Patch to full width
+
+                    // Extend to the right
                     originalTSContainerWidth = tsContainer.width;
                     int extendAmount = (int)((tsCloseButton.absolutePosition.x - tsContainer.absolutePosition.x - tsContainer.width) / 109f);
                     tsContainer.width += extendAmount * 109f;
+
+                    // Extend to the left
+                    originalTSContainerX = tsContainer.absolutePosition.x;
+                    GameObject advisorButtonGameObject = GameObject.Find("AdvisorButton");
+                    UIPanel optionsBar = GameObject.Find("OptionsBar").GetComponent<UIPanel>();
+
+                    float maxX = optionsBar.absolutePosition.x + optionsBar.width;
+                    if (advisorButtonGameObject != null)
+                    {
+                        UIMultiStateButton advisorButton = advisorButtonGameObject.GetComponent<UIMultiStateButton>();
+                        maxX = Mathf.Max(maxX, advisorButton.absolutePosition.x + advisorButton.width);
+                    }
+                    extendAmount = (int)((tsContainer.absolutePosition.x - maxX) / 109f);
+                    tsContainer.absolutePosition = new Vector2(tsContainer.absolutePosition.x - extendAmount * 109f, tsContainer.absolutePosition.y);
+                    tsContainer.width += extendAmount * 109f;
+
                     break;
             }
         }

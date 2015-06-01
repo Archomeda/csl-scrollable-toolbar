@@ -53,6 +53,7 @@ namespace ScrollableToolbar.UI
         /// <param name="prefabInfo"></param>
         private static void OnAssetEditorModeChange(PrefabInfo info)
         {
+            OnToolbarClosed();
             HookToolbar();
         }
 
