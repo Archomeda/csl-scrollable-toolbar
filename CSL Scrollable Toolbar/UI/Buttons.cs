@@ -32,8 +32,9 @@ namespace ScrollableToolbar.UI
             ResetSwitchModeButtonPosition();
 
             // Set additional settings
+            switchModeButton.name = "SwitchToolbarModeButton";
             switchModeButton.playAudioEvents = true;
-            switchModeButton.tooltip = "Toggle the toolbar between normal and full width";
+            switchModeButton.tooltip = "Toggle between normal and extended width";
             switchModeButton.isTooltipLocalized = false;
 
             // Add background sprites
