@@ -65,12 +65,15 @@ namespace ScrollableToolbar.UI
             UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
             UIButton tsCloseButton = GameObject.Find("TSCloseButton").GetComponent<UIButton>();
 
+            float newX = tsContainer.absolutePosition.x;
+            float newWidth = tsContainer.width;
+
             switch (value)
             {
                 case 0:
                     // Reset to normal width
-                    tsContainer.absolutePosition = new Vector2(originalTSContainerX, tsContainer.absolutePosition.y);
-                    tsContainer.width = originalTSContainerWidth;
+                    newX = originalTSContainerX;
+                    newWidth = originalTSContainerWidth;
                     break;
 
                 case 1:
@@ -79,7 +82,7 @@ namespace ScrollableToolbar.UI
                     // Extend to the right
                     originalTSContainerWidth = tsContainer.width;
                     int extendAmount = (int)((tsCloseButton.absolutePosition.x - tsContainer.absolutePosition.x - tsContainer.width) / 109f);
-                    tsContainer.width += extendAmount * 109f;
+                    newWidth += extendAmount * 109f;
 
                     // Extend to the left
                     originalTSContainerX = tsContainer.absolutePosition.x;
@@ -93,14 +96,16 @@ namespace ScrollableToolbar.UI
                         maxX = Mathf.Max(maxX, advisorButton.absolutePosition.x + advisorButton.width);
                     }
                     extendAmount = (int)((tsContainer.absolutePosition.x - maxX) / 109f);
-                    tsContainer.absolutePosition = new Vector2(tsContainer.absolutePosition.x - extendAmount * 109f, tsContainer.absolutePosition.y);
-                    tsContainer.width += extendAmount * 109f;
+                    newX = tsContainer.absolutePosition.x - extendAmount * 109f;
+                    newWidth += extendAmount * 109f;
 
                     break;
             }
 
-            lastTSContainerX = tsContainer.absolutePosition.x;
-            lastTSContainerWidth = tsContainer.width;
+            lastTSContainerX = newX;
+            lastTSContainerWidth = newWidth;
+            tsContainer.absolutePosition = new Vector2(newX, tsContainer.absolutePosition.y);
+            tsContainer.width = newWidth;
         }
 
         /// <summary>
