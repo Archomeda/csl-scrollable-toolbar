@@ -55,13 +55,18 @@
     <Compile Include="Debug.cs" />
     <Compile Include="Detour\CustomMouseHandler.cs" />
     <Compile Include="Detour\RedirectionHelper.cs" />
-    <Compile Include="Detour\Utils.cs" />
+    <Compile Include="Events\AssetEditorEvents.cs" />
+    <Compile Include="Events\EventsController.cs" />
+    <Compile Include="Events\IEvent.cs" />
+    <Compile Include="Events\ToolbarEvents.cs" />
     <Compile Include="LoadingExtension.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Buttons.cs" />
-    <Compile Include="UI\EventHelpers.cs" />
+    <Compile Include="Utils\ReflectionUtils.cs" />
+    <Compile Include="Utils\ToolbarUtils.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

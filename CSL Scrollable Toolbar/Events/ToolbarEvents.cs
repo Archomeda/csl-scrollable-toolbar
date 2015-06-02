@@ -6,25 +6,20 @@ using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
 
-namespace ScrollableToolbar.UI
+namespace ScrollableToolbar.Events
 {
     /// <summary>
-    /// This static class contains various UI event helpers.
+    /// Contains various events related to the toolbar.
     /// </summary>
-    internal static class EventHelpers
+    internal class ToolbarEvents : IEvent
     {
-        private static void Initialize()
+        public static ToolbarEvents Instance { get; private set; }
+
+        private bool isToolbarOpen;
+
+        public void Start(LoadMode mode)
         {
             isToolbarOpen = false;
-        }
-
-        /// <summary>
-        /// Start monitoring for various UI events in the game.
-        /// </summary>
-        /// <param name="mode">The game mode.</param>
-        public static void StartEvents(LoadMode mode)
-        {
-            Initialize();
 
             switch (mode)
             {
@@ -35,34 +30,24 @@ namespace ScrollableToolbar.UI
                     break;
                 case LoadMode.NewAsset:
                 case LoadMode.LoadAsset:
-                    ToolsModifierControl.toolController.eventEditPrefabChanged += OnAssetEditorModeChange;
+                    // The asset editor has the ability to change the toolbar on the fly,
+                    // so we have to rehook on the toolbar after this happens.
+                    AssetEditorEvents.AssetEditorModeChanged += AssetEditorEvents_AssetEditorModeChanged;
                     break;
             }
 
-            Debug.Log("Started events");
+            Instance = this;
         }
 
-        /// <summary>
-        /// Stop monitoring for the UI events in the game.
-        /// </summary>
-        public static void StopEvents()
+        public void Stop()
         {
-            ToolsModifierControl.toolController.eventEditPrefabChanged -= OnAssetEditorModeChange;
+            AssetEditorEvents.AssetEditorModeChanged -= AssetEditorEvents_AssetEditorModeChanged;
             UnhookToolbar();
 
-            Debug.Log("Stopped events");
+            isToolbarOpen = false;
+            Instance = null;
         }
 
-        /// <summary>
-        /// The asset editor has the ability to change the toolbar on the fly.
-        /// We can monitor for these changes.
-        /// </summary>
-        /// <param name="prefabInfo"></param>
-        private static void OnAssetEditorModeChange(PrefabInfo info)
-        {
-            OnToolbarClosed();
-            HookToolbar();
-        }
 
         public delegate void ToolbarOpenedEventHandler();
         /// <summary>
@@ -76,48 +61,45 @@ namespace ScrollableToolbar.UI
         /// </summary>
         public static event ToolbarClosedEventHandler ToolbarClosed;
 
-        private static bool isToolbarOpen;
-
-
-        private static void OnToolbarOpened()
+        private void OnToolbarOpened()
         {
             var handler = ToolbarOpened;
             if (handler != null)
                 handler();
         }
 
-        private static void OnToolbarClosed()
+        private void OnToolbarClosed()
         {
             var handler = ToolbarClosed;
             if (handler != null)
                 handler();
         }
 
-        private static void HookToolbar()
+        private void HookToolbar()
         {
             UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
             if (tsContainer != null)
             {
                 foreach (UIScrollablePanel panel in tsContainer.GetComponentsInChildren<UIScrollablePanel>())
                 {
-                    panel.eventVisibilityChanged += TSContainerPanel_OnVisibilityChanged;
+                    panel.eventVisibilityChanged += this.ToolbarPanel_OnVisibilityChanged;
                 }
             }
         }
 
-        private static void UnhookToolbar()
+        private void UnhookToolbar()
         {
             UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
             if (tsContainer != null)
             {
                 foreach (UIScrollablePanel panel in tsContainer.GetComponentsInChildren<UIScrollablePanel>())
                 {
-                    panel.eventVisibilityChanged -= TSContainerPanel_OnVisibilityChanged;
+                    panel.eventVisibilityChanged -= this.ToolbarPanel_OnVisibilityChanged;
                 }
             }
         }
 
-        private static void TSContainerPanel_OnVisibilityChanged(UIComponent component, bool value)
+        private void ToolbarPanel_OnVisibilityChanged(UIComponent component, bool value)
         {
             // We have to check the visibility of the parent of the parent of the UIScrollablePanel,
             // since the UIScrollablePanel is bound to a specific tab and we catch this event from every UIScrollablePanel.
@@ -131,17 +113,22 @@ namespace ScrollableToolbar.UI
                 {
                     if (!isToolbarOpen)
                     {
-                        OnToolbarOpened();
-                        isToolbarOpen = true;
+                        this.OnToolbarOpened();
+                        this.isToolbarOpen = true;
                     }
                 }
             }
-            else if (isToolbarOpen)
+            else if (this.isToolbarOpen)
             {
-                OnToolbarClosed();
-                isToolbarOpen = false;
+                this.OnToolbarClosed();
+                this.isToolbarOpen = false;
             }
         }
 
+        private void AssetEditorEvents_AssetEditorModeChanged(PrefabInfo info)
+        {
+            this.OnToolbarClosed();
+            this.HookToolbar();
+        }
     }
 }

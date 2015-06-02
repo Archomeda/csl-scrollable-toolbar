@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ScrollableToolbar.Detour
+namespace ScrollableToolbar.Utils
 {
-    internal static class Utils
+    internal static class ReflectionUtils
     {
         internal static T GetPrivateField<T>(object obj, string name)
         {

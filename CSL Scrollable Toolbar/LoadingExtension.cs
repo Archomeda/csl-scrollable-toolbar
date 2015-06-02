@@ -6,7 +6,9 @@ using System.Text;
 using ColossalFramework.UI;
 using ICities;
 using ScrollableToolbar.Detour;
+using ScrollableToolbar.Events;
 using ScrollableToolbar.UI;
+using ScrollableToolbar.Utils;
 using UnityEngine;
 
 namespace ScrollableToolbar
@@ -31,13 +33,16 @@ namespace ScrollableToolbar
                     break;
                 case LoadMode.NewAsset:
                 case LoadMode.LoadAsset:
-                    ToolsModifierControl.toolController.eventEditPrefabChanged += this.OnAssetEditorModeChange;
+                    // The asset editor has the ability to change the toolbar on the fly,
+                    // so we have to repatch our toolbar panels if this happens.
+                    AssetEditorEvents.AssetEditorModeChanged += AssetEditorEvents_AssetEditorModeChanged;
                     this.PatchAdditionalComponents();
                     break;
             }
 
             this.EnableToggleToolbarWidth(mode);
-            EventHelpers.StartEvents(mode);
+
+            EventsController.StartEvents(mode);
         }
 
         /// <summary>
@@ -46,23 +51,19 @@ namespace ScrollableToolbar
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
-            ToolsModifierControl.toolController.eventEditPrefabChanged -= this.OnAssetEditorModeChange;
 
+            AssetEditorEvents.AssetEditorModeChanged -= this.AssetEditorEvents_AssetEditorModeChanged;
             this.UnpatchPanels();
             this.UnpatchAdditionalComponents();
+
             this.DisableToggleToolbarWidth();
 
-            EventHelpers.StopEvents();
+            EventsController.StopEvents();
         }
 
         private bool[] originalStates;
 
-        /// <summary>
-        /// The asset editor has the ability to change the toolbar on the fly.
-        /// We can monitor these changes and patch the panels when they have been refreshed.
-        /// </summary>
-        /// <param name="prefabInfo"></param>
-        private void OnAssetEditorModeChange(PrefabInfo prefabInfo)
+        private void AssetEditorEvents_AssetEditorModeChanged(PrefabInfo prefabInfo)
         {
             this.PatchPanels();
         }
@@ -73,7 +74,7 @@ namespace ScrollableToolbar
         /// <returns>A list of all patchable <see cref="UIScrollablePanel"/>s</returns>
         private UIScrollablePanel[] FindPatchableScrollablePanels()
         {
-            GameObject obj = GameObject.Find("TSContainer");
+            GameObject obj = ToolbarUtils.GetTSContainer();
             if (obj != null)
             {
                 return obj.GetComponentsInChildren<UIScrollablePanel>();
@@ -164,7 +165,7 @@ namespace ScrollableToolbar
         private void EnableToggleToolbarWidth(LoadMode mode)
         {
             // We only add our switch mode button if the toolbar width hasn't been changed by some other mod, in order to prevent incompatibility
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             int currentWidth = Mathf.RoundToInt(tsContainer.width);
             if (currentWidth == 859)
             {
@@ -199,7 +200,7 @@ namespace ScrollableToolbar
             if (scrollablePanel != null)
             {
                 // We have a UIScrollablePanel as a direct child, this is good, redirect event call
-                Utils.InvokePrivateMethod(scrollablePanel, "OnMouseWheel", eventParam);
+                ReflectionUtils.InvokePrivateMethod(scrollablePanel, "OnMouseWheel", eventParam);
             }
         }
     }

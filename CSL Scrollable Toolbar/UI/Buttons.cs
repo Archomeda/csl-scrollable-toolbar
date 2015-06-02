@@ -5,6 +5,8 @@ using System.Text;
 using System.Timers;
 using ColossalFramework.UI;
 using ICities;
+using ScrollableToolbar.Events;
+using ScrollableToolbar.Utils;
 using UnityEngine;
 
 namespace ScrollableToolbar.UI
@@ -42,7 +44,7 @@ namespace ScrollableToolbar.UI
             }
 
             // Create button and attach it
-            UISlicedSprite tsBar = GameObject.Find("TSBar").GetComponent<UISlicedSprite>();
+            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
             switchModeButton = tsBar.AddUIComponent<UIMultiStateButton>();
 
             // Set layout
@@ -70,20 +72,36 @@ namespace ScrollableToolbar.UI
             switchModeButton.foregroundSprites.AddState();
 
             // Hook onto various events
-            EventHelpers.ToolbarOpened += EventHelpers_ToolbarOpened;
-            EventHelpers.ToolbarClosed += EventHelpers_ToolbarClosed;
+            ToolbarEvents.ToolbarOpened += ToolbarEvents_ToolbarOpened;
+            ToolbarEvents.ToolbarClosed += ToolbarEvents_ToolbarClosed;
 
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             tsContainer.eventSizeChanged += TSContainer_OnSizeChanged;
 
             // Listen to various events
             switchModeButton.eventActiveStateIndexChanged += switchModeButton_eventActiveStateIndexChanged;
         }
 
+        /// <summary>
+        /// Removes our button to switch between the different toolbar modes.
+        /// </summary>
+        public static void RemoveSwitchModeButton()
+        {
+            ToolbarEvents.ToolbarOpened -= ToolbarEvents_ToolbarOpened;
+            ToolbarEvents.ToolbarClosed -= ToolbarEvents_ToolbarClosed;
+
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            tsContainer.eventSizeChanged -= TSContainer_OnSizeChanged;
+
+            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
+            tsBar.RemoveUIComponent(switchModeButton);
+            switchModeButton = null;
+        }
+
         private static void switchModeButton_eventActiveStateIndexChanged(UIComponent component, int value)
         {
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
-            UIButton tsCloseButton = GameObject.Find("TSCloseButton").GetComponent<UIButton>();
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            UIButton tsCloseButton = ToolbarUtils.GetTSCloseButton().GetComponent<UIButton>();
 
             float newX = tsContainer.absolutePosition.x;
             float newWidth = tsContainer.width;
@@ -128,32 +146,16 @@ namespace ScrollableToolbar.UI
             tsContainer.width = newWidth;
         }
 
-        /// <summary>
-        /// Removes our button to switch between the different toolbar modes.
-        /// </summary>
-        public static void RemoveSwitchModeButton()
-        {
-            EventHelpers.ToolbarOpened -= EventHelpers_ToolbarOpened;
-            EventHelpers.ToolbarClosed -= EventHelpers_ToolbarClosed;
-
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
-            tsContainer.eventSizeChanged -= TSContainer_OnSizeChanged;
-
-            UISlicedSprite tsBar = GameObject.Find("TSBar").GetComponent<UISlicedSprite>();
-            tsBar.RemoveUIComponent(switchModeButton);
-            switchModeButton = null;
-        }
-
         private static void ResetSwitchModeButtonPosition()
         {
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             switchModeButton.absolutePosition = (Vector2)tsContainer.absolutePosition + new Vector2(tsContainer.size.x - switchModeButton.size.x - 8, 8);
         }
 
-        private static void EventHelpers_ToolbarOpened()
+        private static void ToolbarEvents_ToolbarOpened()
         {
             // For compatibility with Enhanced Build Panel, we have to check if the UIScrollablePanel has not been patched.
-            UITabContainer tsContainer = GameObject.Find("TSContainer").GetComponent<UITabContainer>();
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             UIScrollablePanel panel = tsContainer.GetComponentsInChildren<UIScrollablePanel>().FirstOrDefault(p => p.isVisible);
             if (panel.name != "ScrollablePanel")
             {
@@ -188,7 +190,7 @@ namespace ScrollableToolbar.UI
             }
         }
 
-        private static void EventHelpers_ToolbarClosed()
+        private static void ToolbarEvents_ToolbarClosed()
         {
             switchModeButton.isVisible = false;
         }
