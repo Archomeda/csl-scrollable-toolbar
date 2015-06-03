@@ -80,6 +80,9 @@ namespace ScrollableToolbar.UI
 
             // Listen to various events
             switchModeButton.eventActiveStateIndexChanged += switchModeButton_eventActiveStateIndexChanged;
+
+            // Depending on the previous state, set correct mode
+            switchModeButton.activeStateIndex = Configuration.Instance.State.ToolbarHasExtendedWidth ? 1 : 0;
         }
 
         /// <summary>
@@ -144,6 +147,9 @@ namespace ScrollableToolbar.UI
             lastTSContainerWidth = newWidth;
             tsContainer.absolutePosition = new Vector2(newX, tsContainer.absolutePosition.y);
             tsContainer.width = newWidth;
+
+            // Save state
+            Configuration.Instance.State.ToolbarHasExtendedWidth = value == 1;
         }
 
         private static void ResetSwitchModeButtonPosition()

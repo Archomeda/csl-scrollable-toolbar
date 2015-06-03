@@ -8,9 +8,13 @@ namespace ScrollableToolbar
 {
     public class Mod : IUserMod
     {
+        internal const string FriendlyName = "Scrollable Toolbar";
+        internal const string AssemblyName = "ScrollableToolbar";
+        internal const ulong WorkshopId = 451700838;
+
         public string Name
         {
-            get { return "Scrollable Toolbar"; }
+            get { return FriendlyName; }
         }
 
         public string Description
