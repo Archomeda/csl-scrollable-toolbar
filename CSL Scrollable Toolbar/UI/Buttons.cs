@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -58,18 +59,25 @@ namespace ScrollableToolbar.UI
             switchModeButton.tooltip = "Toggle between normal and extended width";
             switchModeButton.isTooltipLocalized = false;
 
+            // Add atlas
+            switchModeButton.atlas = AtlasUtils.GetUIButtonsAtlas();
+
             // Add background sprites
             switchModeButton.backgroundSprites.AddState();
-            switchModeButton.backgroundSprites[0].disabled = "OptionBase";
-            switchModeButton.backgroundSprites[0].hovered = "OptionBaseHovered";
-            switchModeButton.backgroundSprites[0].normal = "OptionBase";
-            switchModeButton.backgroundSprites[0].pressed = "OptionBasePressed";
-            switchModeButton.backgroundSprites[1].disabled = "OptionBase";
-            switchModeButton.backgroundSprites[1].normal = "OptionBaseFocused";
-            switchModeButton.backgroundSprites[1].pressed = "OptionBasePressed";
+            switchModeButton.backgroundSprites[0].normal = "Base";
+            switchModeButton.backgroundSprites[0].hovered = "BaseHovered";
+            switchModeButton.backgroundSprites[0].pressed = "BasePressed";
+            switchModeButton.backgroundSprites[1].normal = "Base";
+            switchModeButton.backgroundSprites[1].hovered = "BaseHovered";
+            switchModeButton.backgroundSprites[1].pressed = "BasePressed";
 
             // Add foreground sprites
             switchModeButton.foregroundSprites.AddState();
+            switchModeButton.foregroundSprites[0].normal = "ArrowRight";
+            switchModeButton.foregroundSprites[1].normal = "ArrowLeft";
+
+            // Fix some NullReferenceException for m_spritePadding
+            switchModeButton.spritePadding = new RectOffset();
 
             // Hook onto various events
             ToolbarEvents.ToolbarOpened += ToolbarEvents_ToolbarOpened;
