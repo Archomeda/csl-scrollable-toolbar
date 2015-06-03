@@ -21,6 +21,10 @@ mod too.
     completely if another mod changes the toolbar. Please consult the notes
     below.
 
+## Custom configuration settings
+For more information about customizing your configuration settings, go to
+[CONFIGURATION.md](CONFIGURATION.md).
+
 ## Installation
 Go to the
 [Steam Workshop](http://steamcommunity.com/sharedfiles/filedetails/?id=451700838)
