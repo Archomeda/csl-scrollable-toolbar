@@ -23,6 +23,8 @@ namespace ScrollableToolbar
         {
             base.OnLevelLoaded(mode);
 
+            Configuration.Load();
+
             switch (mode)
             {
                 case LoadMode.NewGame:
@@ -59,6 +61,8 @@ namespace ScrollableToolbar
             this.DisableToggleToolbarWidth();
 
             EventsController.StopEvents();
+
+            Configuration.Save();
         }
 
         private bool[] originalStates;
