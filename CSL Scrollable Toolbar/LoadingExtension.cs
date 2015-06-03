@@ -24,27 +24,39 @@ namespace ScrollableToolbar
             base.OnLevelLoaded(mode);
 
             Configuration.Load();
+            bool isActive = false;
 
-            switch (mode)
+            if (Configuration.Instance.Features.ToolbarScrolling)
             {
-                case LoadMode.NewGame:
-                case LoadMode.LoadGame:
-                default:
-                    this.PatchPanels();
-                    this.PatchAdditionalComponents();
-                    break;
-                case LoadMode.NewAsset:
-                case LoadMode.LoadAsset:
-                    // The asset editor has the ability to change the toolbar on the fly,
-                    // so we have to repatch our toolbar panels if this happens.
-                    AssetEditorEvents.AssetEditorModeChanged += AssetEditorEvents_AssetEditorModeChanged;
-                    this.PatchAdditionalComponents();
-                    break;
+                switch (mode)
+                {
+                    case LoadMode.NewGame:
+                    case LoadMode.LoadGame:
+                    default:
+                        this.PatchPanels();
+                        this.PatchAdditionalComponents();
+                        break;
+                    case LoadMode.NewAsset:
+                    case LoadMode.LoadAsset:
+                        // The asset editor has the ability to change the toolbar on the fly,
+                        // so we have to repatch our toolbar panels if this happens.
+                        AssetEditorEvents.AssetEditorModeChanged += AssetEditorEvents_AssetEditorModeChanged;
+                        this.PatchAdditionalComponents();
+                        break;
+                }
+                isActive = true;
             }
 
-            this.EnableToggleToolbarWidth(mode);
+            if (Configuration.Instance.Features.ToolbarToggleExtendedWidth)
+            {
+                this.EnableToggleToolbarWidth(mode);
+                isActive = true;
+            }
 
-            EventsController.StartEvents(mode);
+            if (isActive)
+            {
+                EventsController.StartEvents(mode);
+            }
         }
 
         /// <summary>
@@ -54,9 +66,12 @@ namespace ScrollableToolbar
         {
             base.OnLevelUnloading();
 
-            AssetEditorEvents.AssetEditorModeChanged -= this.AssetEditorEvents_AssetEditorModeChanged;
-            this.UnpatchPanels();
-            this.UnpatchAdditionalComponents();
+            if (Configuration.Instance.Features.ToolbarScrolling)
+            {
+                AssetEditorEvents.AssetEditorModeChanged -= this.AssetEditorEvents_AssetEditorModeChanged;
+                this.UnpatchPanels();
+                this.UnpatchAdditionalComponents();
+            }
 
             this.DisableToggleToolbarWidth();
 
