@@ -6,8 +6,8 @@ local mod folder. On Windows, this is
 `%LOCALAPPDATA%\Colossal Order\Cities_Skylines\Addons\Mods\ScrollableToolbar`.
 
 ## Features
-*Italic values* are the default values. The following settings can be found in
-the `Features` tree:
+The following settings can be found in the `Features` tree. *Italic values* are
+the default values.
 
  Feature                   | Key name                   | Supported values
  ------------------------- | -------------------------- | ----------------
@@ -17,3 +17,11 @@ the `Features` tree:
 ## State
 These settings are found in the `State` tree. Please do not change any of these,
 unless you know what you're doing. I'm not responsible if you broke your game.
+
+## Other settings
+These settings are not contained within a specific tree. *Italic values* are the
+default values.
+
+ Setting             | Key name          | Supported values
+ ------------------- | ----------------- | ----------------
+ Extra debug logging | ExtraDebugLogging | true, *false*
