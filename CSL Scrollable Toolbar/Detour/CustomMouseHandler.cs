@@ -15,13 +15,13 @@ namespace ScrollableToolbar.Detour
     /// This only requires a small bit of code to be rewritten, but it involves a HUGE bit of copy-paste code.
     /// If you feel lucky, go ahead and try to understand the code. I probably won't even recognize what I did in a few weeks...
     /// </summary>
-    public static class CustomMouseHandler
+    internal static class CustomMouseHandler
     {
         private static readonly MethodInfo processInputOriginal = typeof(UIInput.MouseHandler).GetMethod("ProcessInput");
         private static readonly MethodInfo processInputReplacement = typeof(CustomMouseHandler).GetMethod("ProcessInput");
         private static RedirectCallsState processInputState;
 
-        internal static void Detour()
+        public static void Detour()
         {
             try
             {
@@ -34,7 +34,7 @@ namespace ScrollableToolbar.Detour
             }
         }
 
-        internal static void UnDetour()
+        public static void UnDetour()
         {
             try
             {

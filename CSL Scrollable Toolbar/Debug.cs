@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ScrollableToolbar
 {
-    static class Debug
+    internal static class Debug
     {
         public static void Log(string str)
         {
