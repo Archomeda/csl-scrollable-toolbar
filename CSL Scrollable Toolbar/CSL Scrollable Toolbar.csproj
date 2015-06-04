@@ -63,7 +63,7 @@
     <Compile Include="LoadingExtension.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Buttons.cs" />
+    <Compile Include="UI\Toolbar.cs" />
     <Compile Include="Utils\AtlasUtils.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="Utils\PluginUtils.cs" />

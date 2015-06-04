@@ -12,9 +12,10 @@ using UnityEngine;
 
 namespace ScrollableToolbar.UI
 {
-    internal static class Buttons
+    internal static class Toolbar
     {
-        private static UIMultiStateButton switchModeButton;
+        private static UIPanel toolbarControlBox;
+        private static UIMultiStateButton toggleToolbarWidthButton;
         private static float originalTSContainerX;
         private static float originalTSContainerWidth;
         private static float lastTSContainerX;
@@ -23,10 +24,54 @@ namespace ScrollableToolbar.UI
 
 
         /// <summary>
+        /// Creates our control box for the toolbar on which we can add buttons.
+        /// </summary>
+        /// <param name="mode">The game mode.</param>
+        public static void CreateToolbarControlBox(LoadMode mode)
+        {
+            if (toolbarControlBox != null)
+            {
+                // We already created it
+                return;
+            }
+
+            // Create panel and attach it
+            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
+            toolbarControlBox = tsBar.AddUIComponent<UIPanel>();
+            toolbarControlBox.name = "ToolbarControlBox";
+
+            // Set layout
+            toolbarControlBox.isVisible = false;
+            toolbarControlBox.anchor = UIAnchorStyle.Right | UIAnchorStyle.Top;
+            toolbarControlBox.autoLayout = true;
+            toolbarControlBox.autoLayoutPadding = new RectOffset(2, 2, 5, 5);
+            toolbarControlBox.autoLayoutDirection = LayoutDirection.Horizontal;
+            toolbarControlBox.autoLayoutStart = LayoutStart.TopRight;
+            toolbarControlBox.autoSize = true;
+            toolbarControlBox.size = new Vector2(0, 18);
+            ResetToolbarControlBoxPosition();
+
+            // Hook onto various events
+            ToolbarEvents.ToolbarOpened += ToolbarEvents_ToolbarOpened;
+            ToolbarEvents.ToolbarClosed += ToolbarEvents_ToolbarClosed;
+            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            tsContainer.eventSizeChanged += TSContainer_OnSizeChanged;
+
+            Logger.Debug("Created ToolbarControlBox");
+        }
+
+        /// <summary>
         /// Creates our button to switch between the different toolbar modes.
         /// </summary>
-        public static void CreateSwitchModeButton(LoadMode mode)
+        /// <param name="mode">The game mode.</param>
+        public static void CreateToggleToolbarWidthButton(LoadMode mode)
         {
+            if (toggleToolbarWidthButton != null)
+            {
+                // We already created it
+                return;
+            }
+
             // Initialize variables
             lastTSContainerWidth = 859f;
             switch (mode)
@@ -45,58 +90,52 @@ namespace ScrollableToolbar.UI
             }
 
             // Create button and attach it
-            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
-            switchModeButton = tsBar.AddUIComponent<UIMultiStateButton>();
+            toggleToolbarWidthButton = toolbarControlBox.AddUIComponent<UIMultiStateButton>();
 
             // Set layout
-            switchModeButton.isVisible = false;
-            switchModeButton.size = new Vector2(18, 18);
-            ResetSwitchModeButtonPosition();
+            toggleToolbarWidthButton.isVisible = false;
+            toggleToolbarWidthButton.size = new Vector2(18, 18);
 
             // Set additional settings
-            switchModeButton.name = "SwitchToolbarModeButton";
-            switchModeButton.playAudioEvents = true;
-            switchModeButton.tooltip = "Toggle between normal and extended width";
-            switchModeButton.isTooltipLocalized = false;
+            toggleToolbarWidthButton.name = "ToggleToolbarWidthButton";
+            toggleToolbarWidthButton.playAudioEvents = true;
+            toggleToolbarWidthButton.tooltip = "Toggle between normal and extended width";
+            toggleToolbarWidthButton.isTooltipLocalized = false;
 
             // Add atlas
-            switchModeButton.atlas = AtlasUtils.GetUIButtonsAtlas();
+            toggleToolbarWidthButton.atlas = AtlasUtils.GetUIButtonsAtlas();
 
             // Add background sprites
-            switchModeButton.backgroundSprites.AddState();
-            switchModeButton.backgroundSprites[0].normal = "Base";
-            switchModeButton.backgroundSprites[0].hovered = "BaseHovered";
-            switchModeButton.backgroundSprites[0].pressed = "BasePressed";
-            switchModeButton.backgroundSprites[1].normal = "Base";
-            switchModeButton.backgroundSprites[1].hovered = "BaseHovered";
-            switchModeButton.backgroundSprites[1].pressed = "BasePressed";
+            toggleToolbarWidthButton.backgroundSprites.AddState();
+            toggleToolbarWidthButton.backgroundSprites[0].normal = "Base";
+            toggleToolbarWidthButton.backgroundSprites[0].hovered = "BaseHovered";
+            toggleToolbarWidthButton.backgroundSprites[0].pressed = "BasePressed";
+            toggleToolbarWidthButton.backgroundSprites[1].normal = "Base";
+            toggleToolbarWidthButton.backgroundSprites[1].hovered = "BaseHovered";
+            toggleToolbarWidthButton.backgroundSprites[1].pressed = "BasePressed";
 
             // Add foreground sprites
-            switchModeButton.foregroundSprites.AddState();
-            switchModeButton.foregroundSprites[0].normal = "ArrowRight";
-            switchModeButton.foregroundSprites[1].normal = "ArrowLeft";
+            toggleToolbarWidthButton.foregroundSprites.AddState();
+            toggleToolbarWidthButton.foregroundSprites[0].normal = "ArrowRight";
+            toggleToolbarWidthButton.foregroundSprites[1].normal = "ArrowLeft";
 
             // Fix some NullReferenceException for m_spritePadding
-            switchModeButton.spritePadding = new RectOffset();
+            toggleToolbarWidthButton.spritePadding = new RectOffset();
 
             // Hook onto various events
-            ToolbarEvents.ToolbarOpened += ToolbarEvents_ToolbarOpened;
-            ToolbarEvents.ToolbarClosed += ToolbarEvents_ToolbarClosed;
-
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
-            tsContainer.eventSizeChanged += TSContainer_OnSizeChanged;
-
-            // Listen to various events
-            switchModeButton.eventActiveStateIndexChanged += switchModeButton_eventActiveStateIndexChanged;
+            toggleToolbarWidthButton.eventActiveStateIndexChanged += toggleToolbarWidthButton_eventActiveStateIndexChanged;
 
             // Depending on the previous state, set correct mode
-            switchModeButton.activeStateIndex = Configuration.Instance.State.ToolbarHasExtendedWidth ? 1 : 0;
+            toggleToolbarWidthButton.activeStateIndex = Configuration.Instance.State.ToolbarHasExtendedWidth ? 1 : 0;
+
+            Logger.Debug("Created ToggleToolbarWidthButton");
         }
+
 
         /// <summary>
         /// Removes our button to switch between the different toolbar modes.
         /// </summary>
-        public static void RemoveSwitchModeButton()
+        public static void RemoveToolbarControlBox()
         {
             ToolbarEvents.ToolbarOpened -= ToolbarEvents_ToolbarOpened;
             ToolbarEvents.ToolbarClosed -= ToolbarEvents_ToolbarClosed;
@@ -105,13 +144,14 @@ namespace ScrollableToolbar.UI
             tsContainer.eventSizeChanged -= TSContainer_OnSizeChanged;
 
             UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
-            tsBar.RemoveUIComponent(switchModeButton);
-            switchModeButton = null;
+            tsBar.RemoveUIComponent(toolbarControlBox);
+            toolbarControlBox = null;
+            toggleToolbarWidthButton = null;
         }
 
-        private static void switchModeButton_eventActiveStateIndexChanged(UIComponent component, int value)
+        private static void toggleToolbarWidthButton_eventActiveStateIndexChanged(UIComponent component, int value)
         {
-            Logger.Debug("switchModeButton activeStateIndexChanged to {0}", value);
+            Logger.Debug("ToggleToolbarWidthButton activeStateIndexChanged to {0}", value);
 
             UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             UIButton tsCloseButton = ToolbarUtils.GetTSCloseButton().GetComponent<UIButton>();
@@ -162,11 +202,11 @@ namespace ScrollableToolbar.UI
             Configuration.Instance.State.ToolbarHasExtendedWidth = value == 1;
         }
 
-        private static void ResetSwitchModeButtonPosition()
+        private static void ResetToolbarControlBoxPosition()
         {
-            Logger.Debug("Resetting position of switchModeButton");
+            Logger.Debug("Resetting position of ToolbarControlBox");
             UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
-            switchModeButton.absolutePosition = (Vector2)tsContainer.absolutePosition + new Vector2(tsContainer.size.x - switchModeButton.size.x - 8, 8);
+            toolbarControlBox.absolutePosition = (Vector2)tsContainer.absolutePosition + new Vector2(tsContainer.size.x - 3, 0);
         }
 
         private static void ToolbarEvents_ToolbarOpened()
@@ -176,7 +216,8 @@ namespace ScrollableToolbar.UI
             UIScrollablePanel panel = tsContainer.GetComponentsInChildren<UIScrollablePanel>().FirstOrDefault(p => p.isVisible);
             if (panel.name != "ScrollablePanel")
             {
-                Logger.Debug("Toolbar opened; switchModeButton not visible due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
+                toggleToolbarWidthButton.isVisible = false;
+                Logger.Debug("Toolbar opened; ToggleToolbarWidthButton not visible due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                 return;
             }
             else
@@ -190,8 +231,8 @@ namespace ScrollableToolbar.UI
                     timer.Stop();
                     if (panel.name != "ScrollablePanel")
                     {
-                        switchModeButton.isVisible = false;
-                        Logger.Debug("switchModeButton not visible after delay due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
+                        toggleToolbarWidthButton.isVisible = false;
+                        Logger.Debug("ToggleToolbarWidthButton not visible after delay due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                     }
                     timer.Dispose();
                 };
@@ -206,20 +247,21 @@ namespace ScrollableToolbar.UI
             if (tsContainer.absolutePosition.x >= lastTSContainerX - measureRange && tsContainer.absolutePosition.x <= lastTSContainerX + measureRange &&
                tsContainer.width >= lastTSContainerWidth - measureRange && tsContainer.width <= lastTSContainerWidth + measureRange)
             {
-                switchModeButton.isVisible = true;
-                Logger.Debug("Toolbar opened; switchModeButton visibility = true");
+                toolbarControlBox.isVisible = true;
+                toggleToolbarWidthButton.isVisible = true;
+                Logger.Debug("Toolbar opened; ToolbarControlBox and ToggleToolbarWidthButton visibility = true");
             }
         }
 
         private static void ToolbarEvents_ToolbarClosed()
         {
-            switchModeButton.isVisible = false;
-            Logger.Debug("Toolbar closed, switchModeButton visibility = false");
+            toolbarControlBox.isVisible = false;
+            Logger.Debug("Toolbar closed, ToolbarControlBox visibility = false");
         }
 
         private static void TSContainer_OnSizeChanged(UIComponent component, Vector2 value)
         {
-            ResetSwitchModeButtonPosition();
+            ResetToolbarControlBoxPosition();
 
             // We have to reset the child components somehow, we hack this by making the current visible panel invisible and visible again.
             // If you know a better way to reset the layout, let me know!

@@ -205,8 +205,8 @@ namespace ScrollableToolbar
             int currentWidth = Mathf.RoundToInt(tsContainer.width);
             if (currentWidth == 859)
             {
-                Buttons.CreateSwitchModeButton(mode);
-                Logger.Info("Created button to switch the toolbar width");
+                Toolbar.CreateToolbarControlBox(mode);
+                Toolbar.CreateToggleToolbarWidthButton(mode);
             }
             else
             {
@@ -219,7 +219,7 @@ namespace ScrollableToolbar
         /// </summary>
         private void DisableToggleToolbarWidth()
         {
-            Buttons.RemoveSwitchModeButton();
+            Toolbar.RemoveToolbarControlBox();
         }
 
 
