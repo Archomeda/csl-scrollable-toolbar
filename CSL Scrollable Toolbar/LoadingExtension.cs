@@ -24,6 +24,11 @@ namespace ScrollableToolbar
             base.OnLevelLoaded(mode);
 
             Configuration.Load();
+            if (Configuration.Instance.ExtraDebugLogging)
+            {
+                Logger.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
+            }
+
             bool isActive = false;
 
             if (Configuration.Instance.Features.ToolbarScrolling)
