@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
-    <Compile Include="Debug.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Detour\CustomMouseHandler.cs" />
     <Compile Include="Detour\RedirectionHelper.cs" />
     <Compile Include="Events\AssetEditorEvents.cs" />

@@ -40,11 +40,14 @@ namespace ScrollableToolbar
         {
             this.Features = new FeaturesConfig();
             this.State = new StateConfig();
+            this.ExtraDebugLogging = false;
         }
 
         public FeaturesConfig Features { get; set; }
 
         public StateConfig State { get; set; }
+
+        public bool ExtraDebugLogging { get; set; }
 
         [XmlIgnore]
         public static Configuration Instance { get; private set; }
@@ -62,12 +65,12 @@ namespace ScrollableToolbar
                 {
                     Instance = (Configuration)new XmlSerializer(typeof(Configuration)).Deserialize(sr);
                 }
-                Debug.Log("Loaded configuration");
+                Logger.Info("Loaded configuration");
             }
             else
             {
                 Instance = new Configuration();
-                Debug.Log("No configuration file found, loaded default");
+                Logger.Info("No configuration file found, loaded default");
             }
         }
 
@@ -78,7 +81,7 @@ namespace ScrollableToolbar
         {
             if (Instance == null)
             {
-                Debug.Warning("Cannot save configuration when there's no configuration instance!");
+                Logger.Warning("Cannot save configuration when there's no configuration instance!");
                 return;
             }
 
@@ -91,7 +94,7 @@ namespace ScrollableToolbar
             {
                 new XmlSerializer(typeof(Configuration)).Serialize(sw, Instance);
             }
-            Debug.Log("Saved configuration");
+            Logger.Info("Saved configuration");
         }
     }
 }

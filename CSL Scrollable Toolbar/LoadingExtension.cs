@@ -46,16 +46,28 @@ namespace ScrollableToolbar
                 }
                 isActive = true;
             }
+            else
+            {
+                Logger.Debug("Skipping feature ToolbarScrolling as it's disabled");
+            }
 
             if (Configuration.Instance.Features.ToolbarToggleExtendedWidth)
             {
                 this.EnableToggleToolbarWidth(mode);
                 isActive = true;
             }
+            else
+            {
+                Logger.Debug("Skipping feature ToolbarToggleExtendedWidth as it's disabled");
+            }
 
             if (isActive)
             {
                 EventsController.StartEvents(mode);
+            }
+            else
+            {
+                Logger.Debug("No active features found, skip starting events");
             }
         }
 
@@ -109,7 +121,7 @@ namespace ScrollableToolbar
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
             if (panels.Length == 0)
             {
-                Debug.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
+                Logger.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
                 return;
             }
 
@@ -131,7 +143,7 @@ namespace ScrollableToolbar
                 }
             }
 
-            Debug.Log("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
+            Logger.Info("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
         }
 
         /// <summary>
@@ -156,7 +168,7 @@ namespace ScrollableToolbar
                 }
             }
 
-            Debug.Log("{0} patched panels have been reverted to their original state", panels.Length);
+            Logger.Info("{0} patched panels have been reverted to their original state", panels.Length);
         }
 
 
@@ -189,11 +201,11 @@ namespace ScrollableToolbar
             if (currentWidth == 859)
             {
                 Buttons.CreateSwitchModeButton(mode);
-                Debug.Log("Created button to switch the toolbar width");
+                Logger.Info("Created button to switch the toolbar width");
             }
             else
             {
-                Debug.Log("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already");
+                Logger.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already");
             }
         }
 
@@ -218,8 +230,14 @@ namespace ScrollableToolbar
             UIScrollablePanel scrollablePanel = component.GetComponentInChildren<UIScrollablePanel>();
             if (scrollablePanel != null)
             {
+                Logger.Debug("Caught a mouse wheel event on a parent panel, redirecting to its scrollable panel child");
+
                 // We have a UIScrollablePanel as a direct child, this is good, redirect event call
                 ReflectionUtils.InvokePrivateMethod(scrollablePanel, "OnMouseWheel", eventParam);
+            }
+            else
+            {
+                Logger.Debug("Caught a mouse wheel event on a parent panel, but no scrollable panel child has been found");
             }
         }
     }

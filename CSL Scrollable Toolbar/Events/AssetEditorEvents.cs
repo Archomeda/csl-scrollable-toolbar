@@ -17,11 +17,13 @@ namespace ScrollableToolbar.Events
         public void Start(LoadMode mode)
         {
             Instance = this;
+            Logger.Debug("Started AssetEditorEvents");
         }
 
         public void Stop()
         {
             Instance = null;
+            Logger.Debug("Stopped AssetEditorEvents");
         }
 
 

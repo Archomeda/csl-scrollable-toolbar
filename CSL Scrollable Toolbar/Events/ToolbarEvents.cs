@@ -37,6 +37,7 @@ namespace ScrollableToolbar.Events
             }
 
             Instance = this;
+            Logger.Debug("Started ToolbarEvents");
         }
 
         public void Stop()
@@ -46,6 +47,7 @@ namespace ScrollableToolbar.Events
 
             isToolbarOpen = false;
             Instance = null;
+            Logger.Debug("Stopped ToolbarEvents");
         }
 
 

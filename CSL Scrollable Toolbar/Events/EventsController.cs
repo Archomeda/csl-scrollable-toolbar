@@ -26,7 +26,7 @@ namespace ScrollableToolbar.Events
                 events.Add(@event);
                 @event.Start(mode);
             }
-            Debug.Log("{0} event classes have been started", events.Count);
+            Logger.Info("{0} event classes have been started", events.Count);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace ScrollableToolbar.Events
             {
                 @event.Stop();
             }
-            Debug.Log("{0} event classes have been stopped", events.Count);
+            Logger.Info("{0} event classes have been stopped", events.Count);
             events.Clear();
         }
     }

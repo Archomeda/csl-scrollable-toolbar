@@ -103,6 +103,8 @@ namespace ScrollableToolbar.UI
 
         private static void switchModeButton_eventActiveStateIndexChanged(UIComponent component, int value)
         {
+            Logger.Debug("switchModeButton activeStateIndexChanged to {0}", value);
+
             UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             UIButton tsCloseButton = ToolbarUtils.GetTSCloseButton().GetComponent<UIButton>();
 
@@ -154,6 +156,7 @@ namespace ScrollableToolbar.UI
 
         private static void ResetSwitchModeButtonPosition()
         {
+            Logger.Debug("Resetting position of switchModeButton");
             UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
             switchModeButton.absolutePosition = (Vector2)tsContainer.absolutePosition + new Vector2(tsContainer.size.x - switchModeButton.size.x - 8, 8);
         }
@@ -165,6 +168,7 @@ namespace ScrollableToolbar.UI
             UIScrollablePanel panel = tsContainer.GetComponentsInChildren<UIScrollablePanel>().FirstOrDefault(p => p.isVisible);
             if (panel.name != "ScrollablePanel")
             {
+                Logger.Debug("Toolbar opened; switchModeButton not visible due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                 return;
             }
             else
@@ -179,10 +183,12 @@ namespace ScrollableToolbar.UI
                     if (panel.name != "ScrollablePanel")
                     {
                         switchModeButton.isVisible = false;
+                        Logger.Debug("switchModeButton not visible after delay due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                     }
                     timer.Dispose();
                 };
                 timer.Start();
+                Logger.Debug("Toolbar opened; timer started to check if EnhancedBuildPanel changes the name of the scrollable panel after us");
             }
 
 
@@ -193,12 +199,14 @@ namespace ScrollableToolbar.UI
                tsContainer.width >= lastTSContainerWidth - measureRange && tsContainer.width <= lastTSContainerWidth + measureRange)
             {
                 switchModeButton.isVisible = true;
+                Logger.Debug("Toolbar opened; switchModeButton visibility = true");
             }
         }
 
         private static void ToolbarEvents_ToolbarClosed()
         {
             switchModeButton.isVisible = false;
+            Logger.Debug("Toolbar closed, switchModeButton visibility = false");
         }
 
         private static void TSContainer_OnSizeChanged(UIComponent component, Vector2 value)
@@ -207,6 +215,7 @@ namespace ScrollableToolbar.UI
 
             // We have to reset the child components somehow, we hack this by making the current visible panel invisible and visible again.
             // If you know a better way to reset the layout, let me know!
+            Logger.Debug("Size of TSContainer changed, resetting panel layout");
             foreach (var child in component.components.Where(c => c.isVisible))
             {
                 child.isVisible = false;

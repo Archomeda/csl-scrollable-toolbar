@@ -26,11 +26,11 @@ namespace ScrollableToolbar.Detour
             try
             {
                 processInputState = RedirectionHelper.RedirectCalls(processInputOriginal, processInputReplacement);
-                Debug.Log("UIInput.MouseHandler.ProcessInput() has been detoured");
+                Logger.Info("UIInput.MouseHandler.ProcessInput() has been detoured");
             }
             catch (Exception ex)
             {
-                Debug.Error("Exception while detouring UIInput.MouseHandler.ProcessInput(): {0}", ex);
+                Logger.Error("Exception while detouring UIInput.MouseHandler.ProcessInput(): {0}", ex);
             }
         }
 
@@ -39,11 +39,11 @@ namespace ScrollableToolbar.Detour
             try
             {
                 RedirectionHelper.RevertRedirect(processInputOriginal, processInputState);
-                Debug.Log("UIInput.MouseHandler.ProcessInput() detour has been reverted");
+                Logger.Info("UIInput.MouseHandler.ProcessInput() detour has been reverted");
             }
             catch (Exception ex)
             {
-                Debug.Error("Exception while reverting detour UIInput.MouseHandler.ProcessInput(): {0}", ex);
+                Logger.Error("Exception while reverting detour UIInput.MouseHandler.ProcessInput(): {0}", ex);
             }
         }
 
