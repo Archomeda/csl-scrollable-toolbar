@@ -205,7 +205,7 @@ namespace ScrollableToolbar
             }
             else
             {
-                Logger.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already");
+                Logger.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already; expected: ~859, actual: {0}", tsContainer.width);
             }
         }
 
