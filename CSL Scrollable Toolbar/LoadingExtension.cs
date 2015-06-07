@@ -4,9 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ColossalFramework.UI;
+using CommonShared;
+using CommonShared.Events;
+using CommonShared.Utils;
 using ICities;
+using ScrollableToolbar.Defs;
 using ScrollableToolbar.Detour;
-using ScrollableToolbar.Events;
 using ScrollableToolbar.UI;
 using ScrollableToolbar.Utils;
 using UnityEngine;
@@ -23,15 +26,13 @@ namespace ScrollableToolbar
         {
             base.OnLevelLoaded(mode);
 
-            Configuration.Load();
-            if (Configuration.Instance.ExtraDebugLogging)
+            Mod.Settings = Config.LoadConfig<Configuration>(Mod.SettingsFilename);
+            if (Mod.Settings.ExtraDebugLogging)
             {
-                Logger.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
+                Mod.Log.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
             }
 
-            bool isActive = false;
-
-            if (Configuration.Instance.Features.ToolbarScrolling)
+            if (Mod.Settings.Features.ToolbarScrolling)
             {
                 switch (mode)
                 {
@@ -49,30 +50,19 @@ namespace ScrollableToolbar
                         this.PatchAdditionalComponents();
                         break;
                 }
-                isActive = true;
             }
             else
             {
-                Logger.Debug("Skipping feature ToolbarScrolling as it's disabled");
+                Mod.Log.Debug("Skipping feature ToolbarScrolling as it's disabled");
             }
 
-            if (Configuration.Instance.Features.ToolbarToggleExtendedWidth)
+            if (Mod.Settings.Features.ToolbarToggleExtendedWidth)
             {
                 this.EnableToggleToolbarWidth(mode);
-                isActive = true;
             }
             else
             {
-                Logger.Debug("Skipping feature ToolbarToggleExtendedWidth as it's disabled");
-            }
-
-            if (isActive)
-            {
-                EventsController.StartEvents(mode);
-            }
-            else
-            {
-                Logger.Debug("No active features found, skip starting events");
+                Mod.Log.Debug("Skipping feature ToolbarToggleExtendedWidth as it's disabled");
             }
         }
 
@@ -83,7 +73,7 @@ namespace ScrollableToolbar
         {
             base.OnLevelUnloading();
 
-            if (Configuration.Instance.Features.ToolbarScrolling)
+            if (Mod.Settings.Features.ToolbarScrolling)
             {
                 AssetEditorEvents.AssetEditorModeChanged -= this.AssetEditorEvents_AssetEditorModeChanged;
                 this.UnpatchPanels();
@@ -92,9 +82,7 @@ namespace ScrollableToolbar
 
             this.DisableToggleToolbarWidth();
 
-            EventsController.StopEvents();
-
-            Configuration.Save();
+            Mod.Settings.SaveConfig(Mod.SettingsFilename);
         }
 
         private bool[] originalStates;
@@ -110,7 +98,7 @@ namespace ScrollableToolbar
         /// <returns>A list of all patchable <see cref="UIScrollablePanel"/>s</returns>
         private UIScrollablePanel[] FindPatchableScrollablePanels()
         {
-            GameObject obj = ToolbarUtils.GetTSContainer();
+            GameObject obj = GameObject.Find(GameObjectDefs.ID_TSCONTAINER);
             if (obj != null)
             {
                 return obj.GetComponentsInChildren<UIScrollablePanel>();
@@ -126,7 +114,7 @@ namespace ScrollableToolbar
             UIScrollablePanel[] panels = FindPatchableScrollablePanels();
             if (panels.Length == 0)
             {
-                Logger.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
+                Mod.Log.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
                 return;
             }
 
@@ -148,7 +136,7 @@ namespace ScrollableToolbar
                 }
             }
 
-            Logger.Info("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
+            Mod.Log.Info("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
         }
 
         /// <summary>
@@ -173,7 +161,7 @@ namespace ScrollableToolbar
                 }
             }
 
-            Logger.Info("{0} patched panels have been reverted to their original state", panels.Length);
+            Mod.Log.Info("{0} patched panels have been reverted to their original state", panels.Length);
         }
 
 
@@ -201,7 +189,7 @@ namespace ScrollableToolbar
         private void EnableToggleToolbarWidth(LoadMode mode)
         {
             // We only add our switch mode button if the toolbar width hasn't been changed by some other mod, in order to prevent incompatibility
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
             int currentWidth = Mathf.RoundToInt(tsContainer.width);
             if (currentWidth == 859)
             {
@@ -210,7 +198,7 @@ namespace ScrollableToolbar
             }
             else
             {
-                Logger.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already; expected: ~859, actual: {0}", tsContainer.width);
+                Mod.Log.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already; expected: ~859, actual: {0}", tsContainer.width);
             }
         }
 
@@ -235,14 +223,14 @@ namespace ScrollableToolbar
             UIScrollablePanel scrollablePanel = component.GetComponentInChildren<UIScrollablePanel>();
             if (scrollablePanel != null)
             {
-                Logger.Debug("Caught a mouse wheel event on a parent panel, redirecting to its scrollable panel child");
+                Mod.Log.Debug("Caught a mouse wheel event on a parent panel, redirecting to its scrollable panel child");
 
                 // We have a UIScrollablePanel as a direct child, this is good, redirect event call
                 ReflectionUtils.InvokePrivateMethod(scrollablePanel, "OnMouseWheel", eventParam);
             }
             else
             {
-                Logger.Debug("Caught a mouse wheel event on a parent panel, but no scrollable panel child has been found");
+                Mod.Log.Debug("Caught a mouse wheel event on a parent panel, but no scrollable panel child has been found");
             }
         }
     }

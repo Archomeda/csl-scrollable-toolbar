@@ -3,27 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ColossalFramework.IO;
-using ColossalFramework.Plugins;
 
 namespace ScrollableToolbar.Utils
 {
     internal static class FileUtils
     {
-        public static string GetModFolder()
-        {
-            var pluginInfo = PluginUtils.GetPluginInfo();
-            return pluginInfo != null ? pluginInfo.modPath : null;
-        }
-
-        public static string GetDataFolder()
-        {
-            return Path.Combine(DataLocation.modsPath, Mod.AssemblyName);
-        }
-
         public static string GetTextureFilePath(string filename)
         {
-            return Path.Combine(Path.Combine(GetModFolder(), "Textures"), filename);
+            return Path.Combine(Path.Combine(CommonShared.Utils.FileUtils.GetAssemblyFolder(), "Textures"), filename);
         }
     }
 }

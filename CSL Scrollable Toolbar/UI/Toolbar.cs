@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using ColossalFramework.UI;
+using CommonShared.Events;
+using CommonShared.Utils;
 using ICities;
-using ScrollableToolbar.Events;
+using ScrollableToolbar.Defs;
 using ScrollableToolbar.Utils;
 using UnityEngine;
 
@@ -36,7 +38,7 @@ namespace ScrollableToolbar.UI
             }
 
             // Create panel and attach it
-            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
+            UISlicedSprite tsBar = GameObject.Find(GameObjectDefs.ID_TSBAR).GetComponent<UISlicedSprite>();
             toolbarControlBox = tsBar.AddUIComponent<UIPanel>();
             toolbarControlBox.name = "ToolbarControlBox";
 
@@ -54,10 +56,10 @@ namespace ScrollableToolbar.UI
             // Hook onto various events
             ToolbarEvents.ToolbarOpened += ToolbarEvents_ToolbarOpened;
             ToolbarEvents.ToolbarClosed += ToolbarEvents_ToolbarClosed;
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
             tsContainer.eventSizeChanged += TSContainer_OnSizeChanged;
 
-            Logger.Debug("Created ToolbarControlBox");
+            Mod.Log.Debug("Created ToolbarControlBox");
         }
 
         /// <summary>
@@ -103,7 +105,7 @@ namespace ScrollableToolbar.UI
             toggleToolbarWidthButton.isTooltipLocalized = false;
 
             // Add atlas
-            toggleToolbarWidthButton.atlas = AtlasUtils.GetUIButtonsAtlas();
+            toggleToolbarWidthButton.atlas = Utils.AtlasUtils.GetUIButtonsAtlas();
 
             // Add background sprites
             toggleToolbarWidthButton.backgroundSprites.AddState();
@@ -126,9 +128,9 @@ namespace ScrollableToolbar.UI
             toggleToolbarWidthButton.eventActiveStateIndexChanged += toggleToolbarWidthButton_eventActiveStateIndexChanged;
 
             // Depending on the previous state, set correct mode
-            toggleToolbarWidthButton.activeStateIndex = Configuration.Instance.State.ToolbarHasExtendedWidth ? 1 : 0;
+            toggleToolbarWidthButton.activeStateIndex = Mod.Settings.State.ToolbarHasExtendedWidth ? 1 : 0;
 
-            Logger.Debug("Created ToggleToolbarWidthButton");
+            Mod.Log.Debug("Created ToggleToolbarWidthButton");
         }
 
 
@@ -140,10 +142,10 @@ namespace ScrollableToolbar.UI
             ToolbarEvents.ToolbarOpened -= ToolbarEvents_ToolbarOpened;
             ToolbarEvents.ToolbarClosed -= ToolbarEvents_ToolbarClosed;
 
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
             tsContainer.eventSizeChanged -= TSContainer_OnSizeChanged;
 
-            UISlicedSprite tsBar = ToolbarUtils.GetTSBar().GetComponent<UISlicedSprite>();
+            UISlicedSprite tsBar = GameObject.Find(GameObjectDefs.ID_TSBAR).GetComponent<UISlicedSprite>();
             tsBar.RemoveUIComponent(toolbarControlBox);
             toolbarControlBox = null;
             toggleToolbarWidthButton = null;
@@ -151,10 +153,10 @@ namespace ScrollableToolbar.UI
 
         private static void toggleToolbarWidthButton_eventActiveStateIndexChanged(UIComponent component, int value)
         {
-            Logger.Debug("ToggleToolbarWidthButton activeStateIndexChanged to {0}", value);
+            Mod.Log.Debug("ToggleToolbarWidthButton activeStateIndexChanged to {0}", value);
 
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
-            UIButton tsCloseButton = ToolbarUtils.GetTSCloseButton().GetComponent<UIButton>();
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
+            UIButton tsCloseButton = GameObject.Find(GameObjectDefs.ID_TSCLOSEBUTTON).GetComponent<UIButton>();
 
             float newX = tsContainer.absolutePosition.x;
             float newWidth = tsContainer.width;
@@ -199,25 +201,25 @@ namespace ScrollableToolbar.UI
             tsContainer.width = newWidth;
 
             // Save state
-            Configuration.Instance.State.ToolbarHasExtendedWidth = value == 1;
+            Mod.Settings.State.ToolbarHasExtendedWidth = value == 1;
         }
 
         private static void ResetToolbarControlBoxPosition()
         {
-            Logger.Debug("Resetting position of ToolbarControlBox");
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            Mod.Log.Debug("Resetting position of ToolbarControlBox");
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
             toolbarControlBox.absolutePosition = (Vector2)tsContainer.absolutePosition + new Vector2(tsContainer.size.x - 3, 0);
         }
 
         private static void ToolbarEvents_ToolbarOpened()
         {
             // For compatibility with Enhanced Build Panel, we have to check if the UIScrollablePanel has not been patched.
-            UITabContainer tsContainer = ToolbarUtils.GetTSContainer().GetComponent<UITabContainer>();
+            UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
             UIScrollablePanel panel = tsContainer.GetComponentsInChildren<UIScrollablePanel>().FirstOrDefault(p => p.isVisible);
             if (panel.name != "ScrollablePanel")
             {
                 toggleToolbarWidthButton.isVisible = false;
-                Logger.Debug("Toolbar opened; ToggleToolbarWidthButton not visible due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
+                Mod.Log.Debug("Toolbar opened; ToggleToolbarWidthButton not visible due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                 return;
             }
             else
@@ -232,12 +234,12 @@ namespace ScrollableToolbar.UI
                     if (panel.name != "ScrollablePanel")
                     {
                         toggleToolbarWidthButton.isVisible = false;
-                        Logger.Debug("ToggleToolbarWidthButton not visible after delay due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
+                        Mod.Log.Debug("ToggleToolbarWidthButton not visible after delay due to panel not having its original name; expected: ScrollablePanel, actual: {0}", panel.name);
                     }
                     timer.Dispose();
                 };
                 timer.Start();
-                Logger.Debug("Toolbar opened; timer started to check if EnhancedBuildPanel changes the name of the scrollable panel after us");
+                Mod.Log.Debug("Toolbar opened; timer started to check if EnhancedBuildPanel changes the name of the scrollable panel after us");
             }
 
 
@@ -249,14 +251,14 @@ namespace ScrollableToolbar.UI
             {
                 toolbarControlBox.isVisible = true;
                 toggleToolbarWidthButton.isVisible = true;
-                Logger.Debug("Toolbar opened; ToolbarControlBox and ToggleToolbarWidthButton visibility = true");
+                Mod.Log.Debug("Toolbar opened; ToolbarControlBox and ToggleToolbarWidthButton visibility = true");
             }
         }
 
         private static void ToolbarEvents_ToolbarClosed()
         {
             toolbarControlBox.isVisible = false;
-            Logger.Debug("Toolbar closed, ToolbarControlBox visibility = false");
+            Mod.Log.Debug("Toolbar closed, ToolbarControlBox visibility = false");
         }
 
         private static void TSContainer_OnSizeChanged(UIComponent component, Vector2 value)
@@ -265,7 +267,7 @@ namespace ScrollableToolbar.UI
 
             // We have to reset the child components somehow, we hack this by making the current visible panel invisible and visible again.
             // If you know a better way to reset the layout, let me know!
-            Logger.Debug("Size of TSContainer changed, resetting panel layout");
+            Mod.Log.Debug("Size of TSContainer changed, resetting panel layout");
             foreach (var child in component.components.Where(c => c.isVisible))
             {
                 child.isVisible = false;

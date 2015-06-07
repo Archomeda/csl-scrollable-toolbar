@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ColossalFramework.UI;
+using CommonShared.Utils;
 using ScrollableToolbar.Utils;
 using UnityEngine;
 
@@ -19,18 +20,18 @@ namespace ScrollableToolbar.Detour
     {
         private static readonly MethodInfo processInputOriginal = typeof(UIInput.MouseHandler).GetMethod("ProcessInput");
         private static readonly MethodInfo processInputReplacement = typeof(CustomMouseHandler).GetMethod("ProcessInput");
-        private static RedirectCallsState processInputState;
+        private static DetourCallsState processInputState;
 
         public static void Detour()
         {
             try
             {
-                processInputState = RedirectionHelper.RedirectCalls(processInputOriginal, processInputReplacement);
-                Logger.Info("UIInput.MouseHandler.ProcessInput() has been detoured");
+                processInputState = DetourUtils.RedirectCalls(processInputOriginal, processInputReplacement);
+                Mod.Log.Info("UIInput.MouseHandler.ProcessInput() has been detoured");
             }
             catch (Exception ex)
             {
-                Logger.Error("Exception while detouring UIInput.MouseHandler.ProcessInput(): {0}", ex);
+                Mod.Log.Error("Exception while detouring UIInput.MouseHandler.ProcessInput(): {0}", ex);
             }
         }
 
@@ -38,12 +39,12 @@ namespace ScrollableToolbar.Detour
         {
             try
             {
-                RedirectionHelper.RevertRedirect(processInputOriginal, processInputState);
-                Logger.Info("UIInput.MouseHandler.ProcessInput() detour has been reverted");
+                DetourUtils.RevertRedirect(processInputOriginal, processInputState);
+                Mod.Log.Info("UIInput.MouseHandler.ProcessInput() detour has been reverted");
             }
             catch (Exception ex)
             {
-                Logger.Error("Exception while reverting detour UIInput.MouseHandler.ProcessInput(): {0}", ex);
+                Mod.Log.Error("Exception while reverting detour UIInput.MouseHandler.ProcessInput(): {0}", ex);
             }
         }
 

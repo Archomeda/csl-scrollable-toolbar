@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using CommonShared;
+using CommonShared.Utils;
 using ICities;
 
 namespace ScrollableToolbar
 {
     public class Mod : IUserMod
     {
-        internal const string FriendlyName = "Scrollable Toolbar";
-        internal const string AssemblyName = "ScrollableToolbar";
-        internal const ulong WorkshopId = 451700838;
+        internal static Configuration Settings;
+        internal static string SettingsFilename = Path.Combine(FileUtils.GetStorageFolder(), "ScrollableToolbar.xml");
+        internal static Logger Log = new Logger();
 
         public string Name
         {
-            get { return FriendlyName; }
+            get { return "Scrollable Toolbar"; }
         }
 
         public string Description
