@@ -1,4 +1,6 @@
 # Cities Skylines: Scrollable Toolbar
+![Preview](PreviewImage.png)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/u7ied8k0aacca1um/branch/master?svg=true)](https://ci.appveyor.com/project/Archomeda/csl-scrollable-toolbar/branch/master)
 
 Are you destroying your left mouse button because of all that clicking on the
@@ -48,19 +50,19 @@ following stuff:
 - Changing the panels in the toolbar in such a way that this mod cannot find
   the containers it has to patch anymore (`UIScrollablePanel` in `TSContainer`)
 
-*Special support:*
+#### Special support
 - Traffic++ (automatically, since it uses the same UI as the game itself)
 
-*Limited support:*
-- Enhanced Build Panel
-  - Only the panels that Enhanced Build Panel does not overwrite, are supported
-    by Scrollable Toolbar.
-  - You might see the toggle button show up for a second sometimes when it's not
-    supposed to be there, but it's nothing to worry about.
-- Sapphire skins
-  - The feature to toggle the toolbar width is disabled. I cannot guarantee that
-    it works for every skin out there (and skins can drastically change the
-    layout!).
+#### Limited support
+- *Enhanced Build Panel* <br>
+  Only the panels that Enhanced Build Panel does not overwrite, are supported
+  by Scrollable Toolbar.
+  You might see the toggle button show up for a second sometimes when it's not
+  supposed to be there, but it's nothing to worry about.
+- *Sapphire skins* <br>
+  The feature to toggle the toolbar width is disabled. I cannot guarantee that
+  it works for every skin out there (and skins can drastically change the
+  layout!).
 
 Even though Scrollable Toolbar has limited features with these mods, Scrollable
 Toolbar should work fine together with those mods.
