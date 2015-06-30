@@ -7,6 +7,7 @@ using ColossalFramework.UI;
 using CommonShared;
 using CommonShared.Configuration;
 using CommonShared.Events;
+using CommonShared.Extensions;
 using CommonShared.Utils;
 using ICities;
 using ScrollableToolbar.Defs;
@@ -135,7 +136,7 @@ namespace ScrollableToolbar
             this.Unload();
         }
 
-        private bool[] originalStates;
+        private Dictionary<UIScrollablePanel, bool> originalStates = new Dictionary<UIScrollablePanel, bool>();
 
         private void AssetEditorEvents_AssetEditorModeChanged(PrefabInfo prefabInfo)
         {
@@ -168,13 +169,12 @@ namespace ScrollableToolbar
                 return;
             }
 
-            this.originalStates = new bool[panels.Length];
             for (int i = 0; i < panels.Length; i++)
             {
                 // Apparently, scrolling with the mouse wheel is supported by the internal code.
                 // But for some reason it's not activated.
                 // We are patching it here by setting the correct field to true.
-                this.originalStates[i] = panels[i].builtinKeyNavigation;
+                this.originalStates[panels[i]] = panels[i].builtinKeyNavigation;
                 panels[i].builtinKeyNavigation = true;
 
                 // In order to have scrolling on the WHOLE panel (e.g. the little space to the left and right of the asset buttons),
@@ -203,7 +203,10 @@ namespace ScrollableToolbar
 
             for (int i = 0; i < panels.Length; i++)
             {
-                panels[i].builtinKeyNavigation = this.originalStates[i];
+                bool state;
+                this.originalStates.TryGetValueOrDefault(panels[i], false, out state);
+                panels[i].builtinKeyNavigation = state;
+
                 UIPanel parentPanel = panels[i].parent as UIPanel;
                 if (parentPanel != null)
                 {
