@@ -43,7 +43,16 @@ namespace ScrollableToolbar
 
         private void Load(LoadMode mode)
         {
-            Mod.Settings = VersionedConfig.LoadConfig<Configuration>(Mod.SettingsFilename);
+            try
+            {
+                Mod.Settings = VersionedConfig.LoadConfig<Configuration>(Mod.SettingsFilename);
+            }
+            catch (Exception ex)
+            {
+                Mod.Log.Error("An exception occured while loading the configuration. Default settings will be loaded instead. {0}", ex);
+                Mod.Settings = new Configuration();
+            }
+
             Mod.Log.EnableDebugLogging = Mod.Settings.ExtraDebugLogging;
 
             if (Mod.Settings.ExtraDebugLogging)
@@ -87,7 +96,14 @@ namespace ScrollableToolbar
 
         private void Unload()
         {
-            Mod.Settings.SaveConfig(Mod.SettingsFilename);
+            try
+            {
+                Mod.Settings.SaveConfig(Mod.SettingsFilename);
+            }
+            catch (Exception ex)
+            {
+                Mod.Log.Error("An exception occured while saving the configuration. Configuration has not been saved. {0}", ex);
+            }
 
             if (Mod.Settings.Features.ToolbarScrolling)
             {
