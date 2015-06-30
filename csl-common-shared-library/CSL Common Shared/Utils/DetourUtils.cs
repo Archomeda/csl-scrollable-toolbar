@@ -1,7 +1,7 @@
-/*
+﻿/*
 The MIT License (MIT)
 
-Copyright (c) 2015 Sebastian Sch�ner
+Copyright (c) 2015 Sebastian Schöner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 The original version can be found at:
  * https://github.com/sschoener/cities-skylines-detour/blob/master/CitiesSkylinesDebugInformation/RedirectionHelper.cs
-This is the edited version by CBeTHaX which can be found at:
+This is a slightly edited version of the edited version by CBeTHaX that can be found at:
  * https://github.com/CBeTHaX/Skylines-Traffic-Manager/blob/master/TLM/TLM/RedirectionHelper.cs
 
 Many thanks to those guys!
@@ -35,9 +35,9 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ScrollableToolbar.Detour
+namespace CommonShared.Utils
 {
-    public struct RedirectCallsState
+    public struct DetourCallsState
     {
         public byte a, b, c, d, e;
         public ulong f;
@@ -47,14 +47,14 @@ namespace ScrollableToolbar.Detour
     /// Helper class to deal with detours. This version is for Unity 5 x64 on Windows.
     /// We provide three different methods of detouring.
     /// </summary>
-    public static class RedirectionHelper
+    public static class DetourUtils
     {
         /// <summary>
         /// Redirects all calls from method 'from' to method 'to'.
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public static RedirectCallsState RedirectCalls(MethodInfo from, MethodInfo to)
+        public static DetourCallsState RedirectCalls(MethodInfo from, MethodInfo to)
         {
             // GetFunctionPointer enforces compilation of the method.
             var fptr1 = from.MethodHandle.GetFunctionPointer();
@@ -62,7 +62,7 @@ namespace ScrollableToolbar.Detour
             return PatchJumpTo(fptr1, fptr2);
         }
 
-        public static void RevertRedirect(MethodInfo from, RedirectCallsState state)
+        public static void RevertRedirect(MethodInfo from, DetourCallsState state)
         {
             var fptr1 = from.MethodHandle.GetFunctionPointer();
             RevertJumpTo(fptr1, state);
@@ -74,9 +74,9 @@ namespace ScrollableToolbar.Detour
         /// </summary>
         /// <param name="site"></param>
         /// <param name="target"></param>
-        private static RedirectCallsState PatchJumpTo(IntPtr site, IntPtr target)
+        private static DetourCallsState PatchJumpTo(IntPtr site, IntPtr target)
         {
-            RedirectCallsState state = new RedirectCallsState();
+            DetourCallsState state = new DetourCallsState();
 
             // R11 is volatile.
             unsafe
@@ -100,7 +100,7 @@ namespace ScrollableToolbar.Detour
             return state;
         }
 
-        private static void RevertJumpTo(IntPtr site, RedirectCallsState state)
+        private static void RevertJumpTo(IntPtr site, DetourCallsState state)
         {
             unsafe
             {

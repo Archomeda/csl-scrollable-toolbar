@@ -2,31 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ColossalFramework.UI;
-using ICities;
 
-namespace ScrollableToolbar.Events
+namespace CommonShared.Events
 {
     /// <summary>
     /// Contains various events related to the asset editor.
     /// </summary>
-    internal class AssetEditorEvents : IEvent
+    public static class AssetEditorEvents
     {
-        public static AssetEditorEvents Instance { get; private set; }
-
-        public void Start(LoadMode mode)
-        {
-            Instance = this;
-            Logger.Debug("Started AssetEditorEvents");
-        }
-
-        public void Stop()
-        {
-            Instance = null;
-            Logger.Debug("Stopped AssetEditorEvents");
-        }
-
-
         /// <summary>
         /// Gets fired when the mode in the asset editor changes.
         /// This is basically a forward to <see cref="ToolController.eventEditPrefabChanged"/>, but provided here for easy access.
