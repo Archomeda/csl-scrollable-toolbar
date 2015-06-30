@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace CommonShared
+namespace CommonShared.Configuration
 {
     /// <summary>
     /// An abstract class that provides basic implementation for loading and saving configuration files.
@@ -18,7 +18,7 @@ namespace CommonShared
         /// </summary>
         /// <typeparam name="T">The config object type.</typeparam>
         /// <param name="filename">The name of the configuration file.</param>
-        public static T LoadConfig<T>(string filename)
+        public static T LoadConfig<T>(string filename) where T : new()
         {
             if (File.Exists(filename))
             {
@@ -27,7 +27,7 @@ namespace CommonShared
                     return (T)new XmlSerializer(typeof(T)).Deserialize(sr);
                 }
             }
-            return default(T);
+            return new T();
         }
 
         /// <summary>
