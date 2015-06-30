@@ -10,7 +10,7 @@ namespace ScrollableToolbar.Utils
     {
         public static string GetTextureFilePath(string filename)
         {
-            return Path.Combine(Path.Combine(CommonShared.Utils.FileUtils.GetAssemblyFolder(), "Textures"), filename);
+            return Path.Combine(Path.Combine(CommonShared.Utils.FileUtils.GetAssemblyFolder(Mod.Instance), "Textures"), filename);
         }
     }
 }

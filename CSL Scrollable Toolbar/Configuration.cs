@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using CommonShared;
+using CommonShared.Configuration;
 using ScrollableToolbar.Utils;
 
 namespace ScrollableToolbar
 {
     [XmlRoot("Configuration")]
-    public class Configuration : Config
+    public class Configuration : VersionedConfig
     {
         [XmlRoot("Features")]
         public class FeaturesConfig
@@ -39,6 +40,8 @@ namespace ScrollableToolbar
 
         public Configuration()
         {
+            this.Version = 1;
+
             this.Features = new FeaturesConfig();
             this.State = new StateConfig();
             this.ExtraDebugLogging = false;
