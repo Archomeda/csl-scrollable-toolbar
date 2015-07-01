@@ -11,8 +11,8 @@ build_script:
 
 artifacts:
   - path: bin
-    name: ScrollableToolbar-v$(appveyor_build_version)
+    name: ExtendedToolbar-v$(appveyor_build_version)
     type: zip
   - path: workshop
-    name: ScrollableToolbar-workshop-v$(appveyor_build_version)
+    name: ExtendedToolbar-workshop-v$(appveyor_build_version)
     type: zip
