@@ -25,18 +25,18 @@ namespace ScrollableToolbar
 
         public string Name
         {
-            get { return "Scrollable Toolbar"; }
+            get { return "Extended Toolbar"; }
         }
 
         public string Description
         {
-            get { return "Makes the toolbar scrollable with your mouse wheel. Save your left mouse button!"; }
+            get { return "Adds a button that allows you to extend the toolbar to full width"; }
         }
 
 
         private void Init()
         {
-            SettingsFilename = Path.Combine(FileUtils.GetStorageFolder(this), "ScrollableToolbar.xml");
+            SettingsFilename = Path.Combine(FileUtils.GetStorageFolder(this), "ExtendedToolbar.xml");
             Log = new Logger(this);
             Instance = this;
         }
