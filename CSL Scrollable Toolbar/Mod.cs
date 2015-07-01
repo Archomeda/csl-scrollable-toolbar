@@ -122,29 +122,5 @@ namespace ScrollableToolbar
         {
             Toolbar.RemoveToolbarControlBox();
         }
-
-
-        /// <summary>
-        /// The mouse wheel event on the parent panel of a <see cref="UIScrollablePanel"/>.
-        /// </summary>
-        /// <param name="component">The component on which the event has been fired.</param>
-        /// <param name="eventParam">Additional event parameters.</param>
-        private void parentPanel_eventMouseWheel(UIComponent component, UIMouseEventParameter eventParam)
-        {
-            // We can't be sure if we get false positives
-            // In order to be sure, we have to check if this component contains the right child first
-            UIScrollablePanel scrollablePanel = component.GetComponentInChildren<UIScrollablePanel>();
-            if (scrollablePanel != null)
-            {
-                Mod.Log.Debug("Caught a mouse wheel event on a parent panel, redirecting to its scrollable panel child");
-
-                // We have a UIScrollablePanel as a direct child, this is good, redirect event call
-                ReflectionUtils.InvokePrivateMethod(scrollablePanel, "OnMouseWheel", eventParam);
-            }
-            else
-            {
-                Mod.Log.Debug("Caught a mouse wheel event on a parent panel, but no scrollable panel child has been found");
-            }
-        }
     }
 }
