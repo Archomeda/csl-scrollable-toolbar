@@ -11,7 +11,6 @@ using CommonShared.Extensions;
 using CommonShared.Utils;
 using ICities;
 using ScrollableToolbar.Defs;
-using ScrollableToolbar.Detour;
 using ScrollableToolbar.UI;
 using UnityEngine;
 
@@ -61,30 +60,6 @@ namespace ScrollableToolbar
                 Mod.Log.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
             }
 
-            if (Mod.Settings.Features.ToolbarScrolling)
-            {
-                switch (mode)
-                {
-                    case LoadMode.NewGame:
-                    case LoadMode.LoadGame:
-                    default:
-                        this.PatchPanels();
-                        this.PatchAdditionalComponents();
-                        break;
-                    case LoadMode.NewAsset:
-                    case LoadMode.LoadAsset:
-                        // The asset editor has the ability to change the toolbar on the fly,
-                        // so we have to repatch our toolbar panels if this happens.
-                        AssetEditorEvents.AssetEditorModeChanged += AssetEditorEvents_AssetEditorModeChanged;
-                        this.PatchAdditionalComponents();
-                        break;
-                }
-            }
-            else
-            {
-                Mod.Log.Debug("Skipping feature ToolbarScrolling as it's disabled");
-            }
-
             if (Mod.Settings.Features.ToolbarToggleExtendedWidth)
             {
                 this.EnableToggleToolbarWidth(mode);
@@ -104,13 +79,6 @@ namespace ScrollableToolbar
             catch (Exception ex)
             {
                 Mod.Log.Error("An exception occured while saving the configuration. Configuration has not been saved. {0}", ex);
-            }
-
-            if (Mod.Settings.Features.ToolbarScrolling)
-            {
-                AssetEditorEvents.AssetEditorModeChanged -= this.AssetEditorEvents_AssetEditorModeChanged;
-                this.UnpatchPanels();
-                this.UnpatchAdditionalComponents();
             }
 
             this.DisableToggleToolbarWidth();
@@ -134,106 +102,6 @@ namespace ScrollableToolbar
         {
             base.OnLevelUnloading();
             this.Unload();
-        }
-
-        private Dictionary<UIScrollablePanel, bool> originalStates = new Dictionary<UIScrollablePanel, bool>();
-
-        private void AssetEditorEvents_AssetEditorModeChanged(PrefabInfo prefabInfo)
-        {
-            this.PatchPanels();
-        }
-
-        /// <summary>
-        /// Finds all <see cref="UIScrollablePanel"/>s in TSContainer that we can patch.
-        /// </summary>
-        /// <returns>A list of all patchable <see cref="UIScrollablePanel"/>s</returns>
-        private UIScrollablePanel[] FindPatchableScrollablePanels()
-        {
-            GameObject obj = GameObject.Find(GameObjectDefs.ID_TSCONTAINER);
-            if (obj != null)
-            {
-                return obj.GetComponentsInChildren<UIScrollablePanel>();
-            }
-            return new UIScrollablePanel[0];
-        }
-
-        /// <summary>
-        /// Patches the <see cref="UIScrollablePanel"/>s to make them accept the mouse wheel as input.
-        /// </summary>
-        private void PatchPanels()
-        {
-            UIScrollablePanel[] panels = FindPatchableScrollablePanels();
-            if (panels.Length == 0)
-            {
-                Mod.Log.Warning("No panels found to patch, aborting; in case there are panels that should be patched, please inform the author of the mod");
-                return;
-            }
-
-            for (int i = 0; i < panels.Length; i++)
-            {
-                // Apparently, scrolling with the mouse wheel is supported by the internal code.
-                // But for some reason it's not activated.
-                // We are patching it here by setting the correct field to true.
-                this.originalStates[panels[i]] = panels[i].builtinKeyNavigation;
-                panels[i].builtinKeyNavigation = true;
-
-                // In order to have scrolling on the WHOLE panel (e.g. the little space to the left and right of the asset buttons),
-                // we also have to redirect certain calls on the parent panel.
-                UIPanel parentPanel = panels[i].parent as UIPanel;
-                if (parentPanel != null)
-                {
-                    parentPanel.eventMouseWheel += parentPanel_eventMouseWheel;
-                }
-            }
-
-            Mod.Log.Info("{0} panels have been patched to be scrollable with the mouse wheel", panels.Length);
-        }
-
-        /// <summary>
-        /// Undo the patch that make the <see cref="UIScrollablePanel"/> accept the mouse wheel as input.
-        /// </summary>
-        private void UnpatchPanels()
-        {
-            UIScrollablePanel[] panels = FindPatchableScrollablePanels();
-
-            if (panels.Length == 0)
-            {
-                return;
-            }
-
-            for (int i = 0; i < panels.Length; i++)
-            {
-                bool state;
-                this.originalStates.TryGetValueOrDefault(panels[i], false, out state);
-                panels[i].builtinKeyNavigation = state;
-
-                UIPanel parentPanel = panels[i].parent as UIPanel;
-                if (parentPanel != null)
-                {
-                    parentPanel.eventMouseWheel -= parentPanel_eventMouseWheel;
-                }
-            }
-
-            Mod.Log.Info("{0} patched panels have been reverted to their original state", panels.Length);
-        }
-
-
-        /// <summary>
-        /// Patch some additional components to make them accept the mouse wheel as input.
-        /// </summary>
-        private void PatchAdditionalComponents()
-        {
-            // Although it is supported, somehow disabled UI objects do not send the OnMouseWheel event.
-            // We are patching that here by redirecting the calls from the original method to our method.
-            CustomMouseHandler.Detour();
-        }
-
-        /// <summary>
-        /// Undo the patch that makes additional componenents accept the mouse wheel as input.
-        /// </summary>
-        private void UnpatchAdditionalComponents()
-        {
-            CustomMouseHandler.UnDetour();
         }
 
         /// <summary>

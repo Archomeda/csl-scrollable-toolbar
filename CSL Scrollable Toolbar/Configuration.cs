@@ -18,11 +18,8 @@ namespace ScrollableToolbar
         {
             public FeaturesConfig()
             {
-                this.ToolbarScrolling = true;
                 this.ToolbarToggleExtendedWidth = true;
             }
-
-            public bool ToolbarScrolling { get; set; }
 
             public bool ToolbarToggleExtendedWidth { get; set; }
         }
