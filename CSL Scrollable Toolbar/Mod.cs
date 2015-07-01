@@ -111,16 +111,8 @@ namespace ScrollableToolbar
         {
             // We only add our switch mode button if the toolbar width hasn't been changed by some other mod, in order to prevent incompatibility
             UITabContainer tsContainer = GameObject.Find(GameObjectDefs.ID_TSCONTAINER).GetComponent<UITabContainer>();
-            int currentWidth = Mathf.RoundToInt(tsContainer.width);
-            if (currentWidth == 859)
-            {
-                Toolbar.CreateToolbarControlBox(mode);
-                Toolbar.CreateToggleToolbarWidthButton(mode);
-            }
-            else
-            {
-                Mod.Log.Warning("Skipped creating button to switch the toolbar width as its width seems to have changed by some other mod already; expected: ~859, actual: {0}", tsContainer.width);
-            }
+            Toolbar.CreateToolbarControlBox(mode);
+            Toolbar.CreateToggleToolbarWidthButton(mode);
         }
 
         /// <summary>
