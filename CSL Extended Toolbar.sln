@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSL Scrollable Toolbar", "CSL Scrollable Toolbar\CSL Scrollable Toolbar.csproj", "{9324024E-5BD9-43FB-8250-7A25DDC4FD3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSL Extended Toolbar", "CSL Extended Toolbar\CSL Extended Toolbar.csproj", "{9324024E-5BD9-43FB-8250-7A25DDC4FD3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSL Common Shared", "csl-common-shared-library\CSL Common Shared\CSL Common Shared.csproj", "{0492B5AF-5B0E-4CFB-8812-465F94070A57}"
 EndProject

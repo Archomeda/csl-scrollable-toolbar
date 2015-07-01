@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CSL Scrollable Toolbar")]
+[assembly: AssemblyTitle("CSL Extended Toolbar")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CSL Scrollable Toolbar")]
+[assembly: AssemblyProduct("CSL Extended Toolbar")]
 [assembly: AssemblyCopyright("Copyright © Dimitri Slappendel 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

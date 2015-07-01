@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ScrollableToolbar.Defs
+namespace ExtendedToolbar.Defs
 {
     public static class GameObjectDefs
     {

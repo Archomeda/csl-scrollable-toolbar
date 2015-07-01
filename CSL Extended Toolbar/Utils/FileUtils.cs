@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace ScrollableToolbar.Utils
+namespace ExtendedToolbar.Utils
 {
     internal static class FileUtils
     {

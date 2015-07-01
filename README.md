@@ -1,31 +1,17 @@
-# Cities Skylines: Scrollable Toolbar
+# Cities Skylines: Extended Toolbar
 ![Preview](PreviewImage.png)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u7ied8k0aacca1um/branch/master?svg=true)](https://ci.appveyor.com/project/Archomeda/csl-scrollable-toolbar/branch/master)
 
-Are you destroying your left mouse button because of all that clicking on the
-right arrow in the toolbar, just to get to that road piece that's way near the
-end? Not anymore! This mod enables mouse wheel scrolling in the toolbar. You can
-now save your precious mouse and your precious time.
+*This mod was previously known as Scrollable Toolbar. But since version 1.1.1,
+the ability to scroll on the toolbar was added in the base game and this mod has
+been renamed to Extended Toolbar.*
 
-This mod for Cities Skylines patches the toolbar UI in such a way, that
-scrolling with your mouse becomes possible. It doesn't matter where you hover
-with your mouse, as long as it's on the toolbar. It should be compatible with
-most, if not all, mods out here. If a mod happens to use the same toolbar UI as
-the game itself (like Traffic++), then this mod will work for the UI of that
-mod too.
-
-## Features
-- Patches the vanilla toolbar panels to be scrollable with the mouse wheel
-- Adds a small button in the top right corner of the toolbar that allows you to
-  toggle between normal width and extended width.
-  - Note however, that this feature is automatically disabled partly or
-    completely if another mod changes the toolbar. Please consult the notes
-    below.
-
-## Custom configuration settings
-For more information about customizing your configuration settings, go to
-[CONFIGURATION.md](CONFIGURATION.md).
+Do you have way too many assets and do you think the toolbar is too small? This
+mod enables you to toggle between two width modes: normal and extended. With the
+extended mode, the mod tries to extend the toolbar as much as possible to the
+right while in-game, and as much as possible to the left in the asset and map
+editor.
 
 ## Installation
 Go to the
@@ -35,7 +21,7 @@ updated with newer releases. If you want to do it manually, you can clone this
 repo, compile the code yourself and place the DLL file in your mods folder.
 
 ## Compatibility
-This mod is based on version 1.1.0 of Cities Skylines, and it is not guaranteed
+This mod is based on version 1.1.1 of Cities Skylines, and it is not guaranteed
 that it will work on later versions. I'll try to keep it updated when newer
 versions are released however.
 
@@ -44,28 +30,20 @@ should not break your saves (as far as I know). Just disable the mod for the
 time being until an update of this mod is released.
 
 ### Mods
-This mod should be compatible with all mods, as long as they don't change the
-following stuff:
-- Detouring of `UIInput.MouseHandler.ProcessInput()`
-- Changing the panels in the toolbar in such a way that this mod cannot find
-  the containers it has to patch anymore (`UIScrollablePanel` in `TSContainer`)
-
-#### Special support
-- Traffic++ (automatically, since it uses the same UI as the game itself)
+This mod should be compatible with all mods, as long as they don't significantly
+change the toolbar. This means that it's likely that this mod does not work with
+Sapphire skins.
 
 #### Limited support
 - *Enhanced Build Panel* <br>
   Only the panels that Enhanced Build Panel does not overwrite, are supported
-  by Scrollable Toolbar.
+  by Extended Toolbar.
   You might see the toggle button show up for a second sometimes when it's not
   supposed to be there, but it's nothing to worry about.
 - *Sapphire skins* <br>
-  The feature to toggle the toolbar width is disabled. I cannot guarantee that
-  it works for every skin out there (and skins can drastically change the
-  layout!).
-
-Even though Scrollable Toolbar has limited features with these mods, Scrollable
-Toolbar should work fine together with those mods.
+  I cannot guarantee that this mod works for every skin out there, since skins
+  can change the layout drastically. If you happen to use a skin that does not
+  work with Extended Toolbar, please disable this mod.
 
 ## Contributing
 I'm open for any contributions you can make. If you find a bug, create an issue
@@ -84,4 +62,3 @@ add your `SteamApps/Common/Cities_Skylines/Cities_Data/Managed` folder there.
 
 Also, please refrain from adding those hardcoded references in the solution
 file if you want to submit a pull request.
-

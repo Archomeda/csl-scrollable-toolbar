@@ -6,9 +6,9 @@ using System.Text;
 using System.Xml.Serialization;
 using CommonShared;
 using CommonShared.Configuration;
-using ScrollableToolbar.Utils;
+using ExtendedToolbar.Utils;
 
-namespace ScrollableToolbar
+namespace ExtendedToolbar
 {
     [XmlRoot("Configuration")]
     public class Configuration : VersionedConfig
@@ -18,11 +18,8 @@ namespace ScrollableToolbar
         {
             public FeaturesConfig()
             {
-                this.ToolbarScrolling = true;
                 this.ToolbarToggleExtendedWidth = true;
             }
-
-            public bool ToolbarScrolling { get; set; }
 
             public bool ToolbarToggleExtendedWidth { get; set; }
         }

@@ -1,5 +1,5 @@
 # We follow the versioning of Cities Skylines
-version: 1.1.0.{build}
+version: 1.1.1.{build}
 
 configuration: Release
 
@@ -11,8 +11,8 @@ build_script:
 
 artifacts:
   - path: bin
-    name: ScrollableToolbar-v$(appveyor_build_version)
+    name: ExtendedToolbar-v$(appveyor_build_version)
     type: zip
   - path: workshop
-    name: ScrollableToolbar-workshop-v$(appveyor_build_version)
+    name: ExtendedToolbar-workshop-v$(appveyor_build_version)
     type: zip
