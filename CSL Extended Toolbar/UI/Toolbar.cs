@@ -8,11 +8,11 @@ using ColossalFramework.UI;
 using CommonShared.Events;
 using CommonShared.Utils;
 using ICities;
-using ScrollableToolbar.Defs;
-using ScrollableToolbar.Utils;
+using ExtendedToolbar.Defs;
+using ExtendedToolbar.Utils;
 using UnityEngine;
 
-namespace ScrollableToolbar.UI
+namespace ExtendedToolbar.UI
 {
     internal static class Toolbar
     {

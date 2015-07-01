@@ -6,7 +6,7 @@ using System.Text;
 using ColossalFramework.UI;
 using UnityEngine;
 
-namespace ScrollableToolbar.Utils
+namespace ExtendedToolbar.Utils
 {
     internal static class AtlasUtils
     {
@@ -25,7 +25,7 @@ namespace ScrollableToolbar.Utils
 
             UITextureAtlas atlas = CommonShared.Utils.AtlasUtils.CreateAtlas(
                 FileUtils.GetTextureFilePath("UIButtons.png"),
-                "ScrollableToolbarUIButtonsAtlas",
+                "ExtendedToolbarUIButtonsAtlas",
                 "UI/Default UI Shader",
                 new Vector2(36, 36),
                 new Vector2(3, 2),

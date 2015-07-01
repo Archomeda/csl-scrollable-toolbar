@@ -7,8 +7,8 @@
     <ProjectGuid>{9324024E-5BD9-43FB-8250-7A25DDC4FD3A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScrollableToolbar</RootNamespace>
-    <AssemblyName>ScrollableToolbar</AssemblyName>
+    <RootNamespace>ExtendedToolbar</RootNamespace>
+    <AssemblyName>ExtendedToolbar</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

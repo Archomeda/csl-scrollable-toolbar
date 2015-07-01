@@ -10,11 +10,11 @@ using CommonShared.Events;
 using CommonShared.Extensions;
 using CommonShared.Utils;
 using ICities;
-using ScrollableToolbar.Defs;
-using ScrollableToolbar.UI;
+using ExtendedToolbar.Defs;
+using ExtendedToolbar.UI;
 using UnityEngine;
 
-namespace ScrollableToolbar
+namespace ExtendedToolbar
 {
     public class Mod : LoadingExtensionBase, IUserMod
     {

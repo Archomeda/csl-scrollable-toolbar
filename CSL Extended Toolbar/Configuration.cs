@@ -6,9 +6,9 @@ using System.Text;
 using System.Xml.Serialization;
 using CommonShared;
 using CommonShared.Configuration;
-using ScrollableToolbar.Utils;
+using ExtendedToolbar.Utils;
 
-namespace ScrollableToolbar
+namespace ExtendedToolbar
 {
     [XmlRoot("Configuration")]
     public class Configuration : VersionedConfig
