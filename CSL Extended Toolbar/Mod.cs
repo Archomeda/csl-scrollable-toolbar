@@ -6,7 +6,6 @@ using System.Text;
 using ColossalFramework.UI;
 using CommonShared;
 using CommonShared.Configuration;
-using CommonShared.Events;
 using CommonShared.Extensions;
 using CommonShared.Utils;
 using ICities;
@@ -18,10 +17,11 @@ namespace ExtendedToolbar
 {
     public class Mod : LoadingExtensionBase, IUserMod
     {
-        internal static Configuration Settings { get; private set; }
-        internal static string SettingsFilename { get; private set; }
-        internal static Logger Log { get; private set; }
         internal static Mod Instance { get; private set; }
+
+        internal Configuration Settings { get; private set; }
+        internal string SettingsFilename { get; private set; }
+        internal Logger Log { get; private set; }
 
         public string Name
         {
@@ -36,37 +36,39 @@ namespace ExtendedToolbar
 
         private void Init()
         {
-            SettingsFilename = Path.Combine(FileUtils.GetStorageFolder(this), "ExtendedToolbar.xml");
-            Log = new Logger(this);
+            this.SettingsFilename = Path.Combine(FileUtils.GetStorageFolder(this), "ExtendedToolbar.xml");
+            this.Log = new Logger(this.GetType().Assembly);
             Instance = this;
+
+            this.Log.Debug("Mod initialized");
         }
 
         private void Load(LoadMode mode)
         {
             try
             {
-                Mod.Settings = VersionedConfig.LoadConfig<Configuration>(Mod.SettingsFilename);
+                this.Settings = VersionedConfig.LoadConfig<Configuration>(this.SettingsFilename);
             }
             catch (Exception ex)
             {
-                Mod.Log.Error("An exception occured while loading the configuration. Default settings will be loaded instead. {0}", ex);
-                Mod.Settings = new Configuration();
+                this.Log.Error("An exception occured while loading the configuration. Default settings will be loaded instead. {0}", ex);
+                this.Settings = new Configuration();
             }
 
-            Mod.Log.EnableDebugLogging = Mod.Settings.ExtraDebugLogging;
+            this.Log.EnableDebugLogging = this.Settings.ExtraDebugLogging;
 
-            if (Mod.Settings.ExtraDebugLogging)
+            if (this.Settings.ExtraDebugLogging)
             {
-                Mod.Log.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
+                this.Log.Warning("Extra debug logging is enabled, please use this only to get more information while hunting for bugs; don't use this when playing normally!");
             }
 
-            if (Mod.Settings.Features.ToolbarToggleExtendedWidth)
+            if (this.Settings.Features.ToolbarToggleExtendedWidth)
             {
                 this.EnableToggleToolbarWidth(mode);
             }
             else
             {
-                Mod.Log.Debug("Skipping feature ToolbarToggleExtendedWidth as it's disabled");
+                this.Log.Debug("Skipping feature ToolbarToggleExtendedWidth as it's disabled");
             }
         }
 
@@ -74,11 +76,11 @@ namespace ExtendedToolbar
         {
             try
             {
-                Mod.Settings.SaveConfig(Mod.SettingsFilename);
+                Mod.Instance.Settings.SaveConfig(Mod.Instance.SettingsFilename);
             }
             catch (Exception ex)
             {
-                Mod.Log.Error("An exception occured while saving the configuration. Configuration has not been saved. {0}", ex);
+                Mod.Instance.Log.Error("An exception occured while saving the configuration. Configuration has not been saved. {0}", ex);
             }
 
             this.DisableToggleToolbarWidth();

@@ -1,13 +1,26 @@
-# We follow the versioning of Cities Skylines
-version: 1.1.1.{build}
+version: 1.2.0.{build}
 
 configuration: Release
 
-cache:
-  - packages -> appveyor\packages.config
+assembly_info:
+  patch: true
+  file: 'CSL Extended Toolbar\Properties\AssemblyInfo.cs'
 
-build_script:
-  - ps: appveyor\Build.ps1
+cache:
+  - packages -> **\packages.config
+
+before_build:
+  - ps: .appveyor\UpdateBuildVersion.ps1
+  - nuget restore
+
+build:
+  verbosity: minimal
+
+after_build:
+  - ps: .appveyor\PrepareArtifactsContents.ps1
+
+on_success:
+  - ps: .appveyor\PrepareNewBuildVersion.ps1
 
 artifacts:
   - path: bin
