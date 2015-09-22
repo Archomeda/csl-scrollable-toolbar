@@ -12,6 +12,8 @@ using ICities;
 using ExtendedToolbar.Defs;
 using ExtendedToolbar.UI;
 using UnityEngine;
+using CommonShared.Proxies.Plugins;
+using ColossalFramework.Steamworks;
 
 namespace ExtendedToolbar
 {
@@ -45,6 +47,17 @@ namespace ExtendedToolbar
 
         private void Load(LoadMode mode)
         {
+            // This does not prevent other people from changing the source, recompiling it and republishing it,
+            // but it does prevent other people from directly republishing the original files.
+            // If you want to contribute, please submit a PR on GitHub here: https://github.com/Archomeda/csl-scrollable-toolbar
+            IPluginInfoInteractor pluginInfo = PluginUtils.GetPluginInfo(this);
+            if (pluginInfo.PublishedFileID != PublishedFileId.invalid && pluginInfo.PublishedFileID.AsUInt64 != 451700838)
+            {
+                // The mod is not published under my name
+                this.Log.Error("YOU ARE CURRENTLY USING AN UNAUTHORIZED PUBLICATION OF THE MOD 'EXTENDED TOOLBAR' WITH FILE ID {0}.\r\nPLEASE USE THE VERSION THAT CAN BE FOUND HERE: http://steamcommunity.com/sharedfiles/filedetails/?id=451700838.\r\n\r\nThis version will not be loaded.", pluginInfo.PublishedFileID.AsUInt64);
+                return;
+            }
+
             try
             {
                 this.Settings = VersionedConfig.LoadConfig<Configuration>(this.SettingsFilename);
