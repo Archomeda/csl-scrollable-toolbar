@@ -44,10 +44,10 @@ namespace ExtendedToolbar
             this.ExtraDebugLogging = false;
         }
 
+        public bool ExtraDebugLogging { get; set; }
+
         public FeaturesConfig Features { get; set; }
 
         public StateConfig State { get; set; }
-
-        public bool ExtraDebugLogging { get; set; }
     }
 }
