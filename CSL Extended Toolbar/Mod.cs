@@ -14,13 +14,16 @@ using UnityEngine;
 
 namespace ExtendedToolbar
 {
-    public class Mod : UserModBase<Mod>
+    public class Mod : UserModBase<Mod>, IUserModSettingsUI
     {
         protected override ulong WorkshopId { get { return 451700838; } }
 
         internal Configuration Settings { get; private set; }
 
         internal string SettingsFilename { get; private set; }
+
+        internal ModOptionsPanel OptionsPanel { get; private set; }
+
 
         #region UserModBase members
 
@@ -64,6 +67,33 @@ namespace ExtendedToolbar
         }
 
         #endregion
+
+
+        #region IUserModSettingsUI
+
+        public void OnSettingsUI(UIHelperBase helper)
+        {
+            // Do regular settings UI stuff
+            UIHelper uiHelper = helper as UIHelper;
+            if (uiHelper != null)
+            {
+                this.OptionsPanel = new ModOptionsPanel(uiHelper);
+                this.OptionsPanel.PerformLayout();
+                this.Log.Debug("Options panel created");
+            }
+            else
+            {
+                this.Log.Warning("Could not populate the settings panel, helper is null or not a UIHelper");
+            }
+        }
+
+        #endregion
+
+
+        public string BuildVersion
+        {
+            get { return "dev version"; }
+        }
 
 
         #region Loading / Unloading
