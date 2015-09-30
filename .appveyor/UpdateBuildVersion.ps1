@@ -24,3 +24,6 @@ if ($version -ne $env:APPVEYOR_BUILD_VERSION) {
 } else {
     Write-Host "  - AppVeyor build version is already up-to-date" -ForegroundColor "Yellow"
 }
+
+Write-Host "  - Apply to code" -ForegroundColor "Yellow"
+SetModVersion $version

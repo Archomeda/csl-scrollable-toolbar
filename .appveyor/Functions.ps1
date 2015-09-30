@@ -7,3 +7,9 @@ Function SetAppVeyorYmlVersion($version) {
     $replace = "`${1}$version"
     RegexReplaceFile -file "appveyor.yml" -regex $regex -replace $replace
 }
+
+Function SetModVersion($version) {
+    $regex = '(get { return ")dev version("; })'
+    $replace = "`${1}$version`${2}"
+    RegexReplaceFile -file "CSL Extended Toolbar\Mod.cs" -regex $regex -replace $replace
+}
